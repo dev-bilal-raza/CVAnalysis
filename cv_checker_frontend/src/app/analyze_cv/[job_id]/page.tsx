@@ -1,15 +1,10 @@
-import React from 'react'
+import JobDetailsPage from "@/components/pages/JobDetailsPage"
 
-const get_job_details = async () => {
-    const response = await fetch("")
-    return await response.json()
-}
-
-const page = ({params}: { params: { job_id : string} }) => {
-    console.log("Job id: ", params.job_id);
-    
+const page = ({ params }: { params: { job_id: number } }) => {
     return (
-        <div> Page</div>
+        <div> 
+            <JobDetailsPage job_id={params.job_id}/>
+        </div>
     )
 }
 

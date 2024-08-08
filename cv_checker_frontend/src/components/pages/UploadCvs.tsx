@@ -3,12 +3,11 @@ import React, { FormEvent, useState } from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import Image from 'next/image'
-import CvImage from "../../../public/analyzecv.png"
 import { add_job } from '../api_calls/job_calls'
 import { handleUploadFiles } from '@/utils/file_handler'
 import { FormSvg } from '../common/Svgs'
 import { useRouter } from 'next/navigation'
-import Spinner from '../common/Spinner'
+import Loader from '../layout/loader/Loader'
 
 
 const UploadCvs = () => {
@@ -102,7 +101,7 @@ const UploadCvs = () => {
         </div>
         {
           loading ?
-            <Spinner /> :
+            <Loader /> :
             <div className='absolute bottom-9 z-40'>
               <Button is_delete={false}>Analyze</Button>
             </div>

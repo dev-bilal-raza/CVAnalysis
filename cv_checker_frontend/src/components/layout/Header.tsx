@@ -39,7 +39,7 @@ const Header = () => {
 
                             <Link href={"/upload_cvs"} >
                                 <Button is_delete={false}>
-                                    Analyze CVs
+                                    Upload CVs
                                 </Button>
                             </Link>
                         </ul>

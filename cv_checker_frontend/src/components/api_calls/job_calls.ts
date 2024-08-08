@@ -1,3 +1,5 @@
+import axios from "axios"
+
 interface JobDetails {
     job_title: string
     job_description: string
@@ -16,27 +18,19 @@ export const add_job = async (job_details: FormData) => {
     }
 }
 
-export const upload_new_cvs = async (files: FormData, job_id: number) => {
-    const response = await fetch(`https://cv-analyzer-backend-oa7fkrczha-uc.a.run.app/api/v1/upload_new_cvs?job_id=${job_id}`,
-        {
-            method: "POST",
-            body: files
-        }
-    );
-    if (response.ok) {
-        return await response.json();
+export const get_aLL_jobs = async () => {
+    const response = await axios.get('http://localhost:8000/api/v1/get_all_jobs', {withCredentials: true});
+    console.log("Response: ", response);
+    
+    if (response.status === 200) {
+        return response
     }
 }
 
-export const update_description = async (job_details: string, job_id: number) => {
-    const response = await fetch(`https://cv-analyzer-backend-oa7fkrczha-uc.a.run.app/api/v1/update_job_description?job_id=${job_id}`,
-        {
-            method: "PUT",
-            body: JSON.stringify({
-                "job_description": job_details
-            })
-        }
-    );
+export const get_job_details = async (job_id: number) => {
+    const response = await fetch(`http://localhost:8000/api/v1/get_job_details?job_id=${job_id}`);
+    console.log("Response: ", response);
+    
     if (response.ok) {
         return await response.json();
     }

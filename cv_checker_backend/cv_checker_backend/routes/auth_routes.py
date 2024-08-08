@@ -9,7 +9,6 @@ from cv_checker_backend.settings import BACKEND_URL, FRONTEND_URL, GITHUB_CLIENT
 
 authRoute = APIRouter()
 
-
 oauth = OAuth()
 
 # Register Google OAuth
@@ -50,15 +49,15 @@ async def google_callback(request: Request, session: DB_SESSION):
     user = token.get("userinfo")
     
     # Debugging: Print user details
-    print("User details:", user)
     if user:
         user_data = {
-        "user_id": user['sub'],
+        "user_id": int(user['sub']),
         "user_name": user['name'],
         "email": user['email'],
         "avatar_url": user['picture'],
-        "token": token['access_token']
+        "token": token['id_token']
         }
+        print("User details:", user_data)
         response = create_user(user_data, session)
         print("Response while creating user in database: " + response)
         request.session['user'] = dict(user)
@@ -94,3 +93,4 @@ async def github_callback(request: Request):
         raise HTTPException(status_code=400, detail=str(error))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    

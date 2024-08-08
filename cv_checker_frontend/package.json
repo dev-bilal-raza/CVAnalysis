@@ -11,6 +11,7 @@
   "dependencies": {
     "@radix-ui/react-label": "^2.0.2",
     "@tabler/icons-react": "^3.5.0",
+    "axios": "^1.7.3",
     "clsx": "^2.1.1",
     "cookies-next": "^4.2.1",
     "firebase": "^10.12.2",

@@ -1,5 +1,6 @@
-from typing import Any, List
+from typing import Annotated, Any, List
 from sqlmodel import select
+from cv_checker_backend.controllers.user_controller import get_user_from_session
 from cv_checker_backend.models.job_models import Job, Cv, CvFeatures
 from fastapi import Depends, UploadFile, File, HTTPException, Form
 from cv_checker_backend.db.db_connector import DB_SESSION
@@ -46,8 +47,8 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(...), job_descri
         }
 
 
-def get_all_jobs(user_id: int, session: DB_SESSION):
-    jobs = session.exec(select(Job).where(Job.user_id == user_id)).all()
+def get_all_jobs(user_data: Annotated[str, Depends(get_user_from_session)], session: DB_SESSION):
+    jobs = session.exec(select(Job).where(Job.user_id == user_data["user_id"])).all()
     all_jobs = []
     for job in jobs:
         cvs = len(job.cvs)
@@ -59,7 +60,7 @@ def get_all_jobs(user_id: int, session: DB_SESSION):
                 "cv_count": cvs
             }
         )
-    return all_jobs
+    return "all_jobs"
 
 def get_all_applicants(user_id: str, session: DB_SESSION):
     jobs = session.exec(select(Job).where(Job.user_id == user_id)).all()
@@ -77,7 +78,8 @@ def get_all_applicants(user_id: str, session: DB_SESSION):
             all_applicants.append(applicants)
     return all_applicants
 
-def get_cvs_by_job(job_id: int, session: DB_SESSION):
+
+def get_cvs_by_job_func(job_id: int, session: DB_SESSION):
     job_data = session.get(Job, job_id)
     if not job_data:
         raise HTTPException(
