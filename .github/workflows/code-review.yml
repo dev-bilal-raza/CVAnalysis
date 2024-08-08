@@ -1,16 +1,12 @@
 name: Code Review and Build Workflow
 
 on:
-  pull_request:
+  push:
     branches:
       - staging
       - master
     types: [opened, synchronize]
 
-  push:
-    branches:
-      - staging
-      - master
 
 jobs:
   review:
