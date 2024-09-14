@@ -1,5 +1,5 @@
 "use client"
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import Image from 'next/image'
@@ -37,7 +37,7 @@ const UploadCvs = () => {
         // router.push(`/analyze_cv/${1}`);
         setLoading(false);
       }
-    }else{
+    } else {
       setResponse("You have not filled the form correctly.");
       setLoading(false);
     }
@@ -48,11 +48,12 @@ const UploadCvs = () => {
       console.log("File Response: " + file_response);
       if (file_response !== true) {
         setResponse("You are only allowed to upload pdf files.")
-      }else{
+      } else {
         setResponse("")
       }
     }
   };
+  
   return (
     <div className='flex justify-center gap-6 p-8'>
       <form onSubmit={uploadCvs} className='relative pb-10 bg-white flex flex-col justify-center w-3/4 items-center gap-4 border-[#1A1D3F] border-8 border-t-3 border-b-0 rounded-lg'>
@@ -78,7 +79,7 @@ const UploadCvs = () => {
         </div>
         <div className="m-4 mb-14">
           <label htmlFor="example5" className="text-center w-full flex justify-center p-2 text-lg font-sans font-medium">Upload CVs</label>
-          <label className="flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 p-6 transition-all hover:border-primary-300">
+          <label className="mb-2 flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 p-6 transition-all hover:border-primary-300">
             <div className="space-y-1 text-center">
               <div className="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 text-gray-500">
@@ -102,7 +103,7 @@ const UploadCvs = () => {
         {
           loading ?
             <Loader /> :
-            <div className='absolute bottom-9 z-40'>
+            <div className='absolute bottom-10 z-40 m-2'>
               <Button is_delete={false}>Analyze</Button>
             </div>
         }

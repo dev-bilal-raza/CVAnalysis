@@ -40,7 +40,7 @@ const FaqUsSection = () => {
                             </div>
                             
                                 <div className={`overflow-hidden transition-max-height ${faq.isShowed ? 'max-h-screen duration-[3000ms]' : 'max-h-0 duration-1000'}`}>
-                                <p className='font-para mx-3 my-5 text-gray-700'>
+                                <p className='font-para md:text-lg mx-3 my-5 text-gray-700'>
                                     {faq.answer}
                                 </p>
                                 </div>
