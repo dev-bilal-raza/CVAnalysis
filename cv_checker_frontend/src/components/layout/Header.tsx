@@ -12,7 +12,9 @@ const Header = () => {
     return (
         <header className='sticky z-20 top-0 w-full px-6 bg-white'>
             <div className='flex justify-between items-center'>
+                <Link href={"/"}>
                 <Image src={logo} className='object-cover' alt='CV Analyzer' width={80} height={80} />
+                </Link>
                 <div className='flex justify-center gap-4'>
                     {!token ?
                         <ul className='flex justify-center items-center gap-6 font-medium text-lg font-sans'>
