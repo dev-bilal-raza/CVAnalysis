@@ -47,7 +47,7 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(...), job_descri
         }
 
 
-def get_all_jobs(user_data: Annotated[str, Depends(get_user_from_session)], session: DB_SESSION):
+def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
     jobs = session.exec(select(Job).where(Job.user_id == user_data["user_id"])).all()
     all_jobs = []
     for job in jobs:
