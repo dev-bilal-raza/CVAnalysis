@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuth, OAuthError  
+from authlib.integrations.starlette_client import OAuth, OAuthError # type: ignore  
 import httpx
 
 from cv_checker_backend.controllers.user_controller import create_user
@@ -51,15 +51,15 @@ async def google_callback(request: Request, session: DB_SESSION):
     # Debugging: Print user details
     if user:
         user_data = {
-        "user_id": int(user['sub']),
         "user_name": user['name'],
         "email": user['email'],
         "avatar_url": user['picture'],
-        "token": token['id_token']
+        "token": token['id_token'],
+        "is_active": True
         }
         print("User details:", user_data)
         response = create_user(user_data, session)
-        print("Response while creating user in database: " + response)
+        # print("Response while creating user in database: " + response)
         request.session['user'] = dict(user)
 
     return RedirectResponse(url=FRONTEND_URL)
@@ -71,19 +71,40 @@ async def github_login(request: Request):
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
 @authRoute.get("/api/v1/auth/github/callback")
-async def github_callback(request: Request):
+async def github_callback(request: Request, session: DB_SESSION):
     try:
         # Obtain the token response
         token = await oauth.github.authorize_access_token(request)
         print("Token response:", token)
-        
-        # Use the token to fetch user details
+                # Use the token to fetch user details
         async with httpx.AsyncClient() as client:
+            # Fetch basic user details
             response = await client.get('https://api.github.com/user', headers={'Authorization': f"Bearer {token['access_token']}"})
             user_info = response.json()
             print("User details:", user_info)
 
+            # Fetch email separately if it's not included in the user info
+            if not user_info.get('email'):
+                email_response = await client.get('https://api.github.com/user/emails', headers={'Authorization': f"Bearer {token['access_token']}"})
+                emails = email_response.json()
+                print("Email Reponse: ", emails)
+                # Find the primary email
+                primary_email = next((email['email'] for email in emails if email['primary']), None)
+                user_info['email'] = primary_email
+
         if user_info:
+            # Now you can store user information in your database
+            user_data = {
+                "user_name": user_info.get('login'),
+                "avatar_url": user_info.get('avatar_url'),
+                "email": user_info.get('email') , # Include email now
+                "token": token["access_token"],
+                "is_active": True
+            }
+            # save user to your database            
+            user_response = create_user(user_data, session)
+            print("Response while creating user in database: " + user_response)
+
             # Store user information in the session
             request.session['user'] = user_info
             return RedirectResponse(url=FRONTEND_URL)  # Redirect to frontend
