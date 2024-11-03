@@ -1,5 +1,5 @@
 import React from 'react'
-import { HeroSvg } from '../common/Svgs'
+import { HeroSvg, HeroBottomSvg } from '../common/Svgs'
 import { MdCompare } from "react-icons/md";
 import { SiWeightsandbiases } from "react-icons/si";
 import { IoTimer } from "react-icons/io5";
@@ -11,9 +11,14 @@ const WhySection = () => {
         <HeroSvg />
       </div>
       <div className='bg-gradient-to-t from-indigo-950 to-black p-4 flex flex-col gap-10'>
-        <h3 className='text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white text-center'>
-          WHY CHOOSE US?
-        </h3>
+        <div className='flex flex-col justify-center items-center gap-4'>
+          <h3 className='text-2xl sm:text-3xl md:text-4xl font-heading font-bold text-white text-center'>
+            WHY CHOOSE US?
+          </h3>
+          <p className='text-xl font-para text-slate-200 text-center font-extralight w-4/6'>
+            Screening resumes manually is time-consuming and error-prone. CV Analyzer uses AI to analyze resumes in seconds, so you can focus on the best candidates. Our tool also helps you remove bias in the hiring process and improve diversity.
+          </p>
+        </div>
         <div className='grid md:grid-cols-3 grid-cols-1 gap-8 text-white'>
           <div className='flex flex-col justify-center items-center gap-2'>
             <MdCompare className='text-white text-6xl' />
@@ -34,6 +39,9 @@ const WhySection = () => {
             </h4>
           </div>
         </div>
+      </div>
+      <div>
+        <HeroBottomSvg />
       </div>
     </div>
   )

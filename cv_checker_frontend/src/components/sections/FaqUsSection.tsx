@@ -21,7 +21,7 @@ const FaqUsSection = () => {
         <div className='bg-gradient-to-b from-indigo-950 via-white via-70% to-white p-8'>
             <div className='h-0.5 bg-gradient-to-r from-[#2A2755] via-white to-[#2A2755]' />
             <div className='p-3 mt-16 rounded-lg m-6 mx-auto bg-white'>
-                <div className='p-11 '>
+                <div className='p-11'>
                     <h2 className='font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-center'>
                         Frequently Asked Questions
                     </h2>

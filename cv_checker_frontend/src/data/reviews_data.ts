@@ -1,9 +1,10 @@
-const reviews_data = [
+import BilalImage from "../../public/Bilal.jpg"
+export const reviews_data = [
     {
         id: 1,
         name: "John Doe",
         position: "Software Engineer",
-        image: "https://randomuser.me/api/portraits",
+        image: "../../public/Bilal.jpg",
         review: "I’ve been using the CV Analyzer for a few months now, and it has completely transformed our hiring process. The accuracy of the matches is impressive, and it has saved us a lot of time and effort. Highly recommended!",
         reviews_points: 100
     },
