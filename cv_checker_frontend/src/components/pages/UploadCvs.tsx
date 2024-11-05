@@ -1,116 +1,321 @@
 "use client"
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
-import Image from 'next/image'
 import { add_job } from '../api_calls/job_calls'
 import { handleUploadFiles } from '@/utils/file_handler'
 import { FormSvg } from '../common/Svgs'
 import { useRouter } from 'next/navigation'
 import Loader from '../layout/loader/Loader'
+import { GridPattern } from '../ui/GridPattern'
 
+const Stepper = ({ step, handleStep, canProceed }: { 
+  step: number; 
+  handleStep: (step: number) => void;
+  canProceed: (step: number) => boolean;
+}) => {
+  const steps = [
+    { number: 1, label: "Job Title" },
+    { number: 2, label: "Job Description" },
+    { number: 3, label: "Upload CVs" },
+  ];
+
+  return (
+    <div className="flex justify-center w-full py-8 mb-4">
+      <div className="relative flex justify-between w-full max-w-3xl px-4">
+        <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200" />
+        
+        <div 
+          className="absolute top-6 left-0 h-1 bg-purple-500 transition-all duration-500 ease-in-out"
+          style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+        />
+
+        {steps.map((s, index) => (
+          <div
+            key={s.number}
+            className="relative flex flex-col items-center"
+            style={{ width: index === 0 || index === steps.length - 1 ? 'auto' : '0' }}
+          >
+            <button
+              onClick={() => handleStep(s.number)}
+              type='button'
+              className={`
+                relative z-10 flex items-center justify-center w-12 h-12 rounded-full
+                transition-all duration-300 ease-in-out transform hover:scale-110
+                ${step >= s.number 
+                  ? 'bg-purple-500 text-white shadow-lg hover:bg-purple-600' 
+                  : 'bg-white border-2 border-gray-200 text-gray-400 hover:border-gray-300'
+                }
+                ${step === s.number ? 'ring-4 ring-purple-200' : ''}
+              `}
+              disabled={!canProceed(s.number)}
+            >
+              <span className="font-bold text-lg">{s.number}</span>
+            </button>
+            
+            <div className={`
+              absolute top-14 mt-4 text-sm font-medium whitespace-nowrap
+              transition-colors duration-300
+              ${step >= s.number ? 'text-purple-600' : 'text-gray-400'}
+            `}>
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const UploadCvs = () => {
+  const [formState, setFormState] = useState({
+    step: 1,
+    jobTitle: '',
+    jobDescription: '',
+    uploadedFiles: [] as File[],
+    fileLimit: false,
+    response: '',
+    loading: false
+  });
 
-  const formData = new FormData();
-  const [loading, setLoading] = useState(false);
-  const [jobTitle, setJobTitle] = useState<string>("");
-  const [jobDescription, setJobDescription] = useState<string>("");
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [fileLimit, setFileLimit] = useState(false);
-  const [response, setResponse] = useState("");
   const router = useRouter();
+
+  // Function to count non-whitespace characters
+  const countNonWhitespace = (str: string): number => {
+    return str.replace(/\s/g, '').length;
+  };
+
+  const canProceedToStep = (targetStep: number): boolean => {
+    if (targetStep <= formState.step) return true;
+    if (targetStep === 2) return true;
+    if (targetStep === 3) return countNonWhitespace(formState.jobDescription) >= 15;
+    return false;
+  };
+
+  const handleStep = (newStep: number) => {
+    if (canProceedToStep(newStep)) {
+      setFormState(prev => ({ ...prev, step: newStep }));
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+
+    const fileResponse = handleUploadFiles(
+      Array.from(event.target.files),
+      formState.uploadedFiles,
+      (limit: boolean) => setFormState(prev => ({ ...prev, fileLimit: limit })),
+      (files: File[]) => setFormState(prev => ({ ...prev, uploadedFiles: files }))
+    );
+
+    setFormState(prev => ({
+      ...prev,
+      response: fileResponse === true ? '' : 'You are only allowed to upload PDF files.'
+    }));
+  };
 
   const uploadCvs = async (e: FormEvent) => {
     e.preventDefault();
-    setResponse("");
-    setLoading(true);
-    if (uploadedFiles.length > 0 && jobTitle && jobDescription) {
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        formData.append('cvs', uploadedFiles[i]);
-      }
-      formData.append("job_title", jobTitle)
-      formData.append("job_description", jobDescription)
-      const response = await add_job(formData)
-      console.log(response);
-      if (response) {
-        // router.push(`/analyze_cv/${1}`);
-        setLoading(false);
+    if (formState.step !== 3) return;
+
+    setFormState(prev => ({ ...prev, loading: true, response: '' }));
+
+    const isValid = formState.uploadedFiles.length > 0 && 
+                   formState.jobTitle && 
+                   countNonWhitespace(formState.jobDescription) >= 15;
+
+    if (isValid) {
+      const formData = new FormData();
+      formState.uploadedFiles.forEach(file => {
+        formData.append('cvs', file);
+      });
+      formData.append('job_title', formState.jobTitle);
+      formData.append('job_description', formState.jobDescription);
+
+      try {
+        const response = await add_job(formData);
+        if (response) {
+          setFormState(prev => ({ ...prev, loading: false }));
+        }
+      } catch (error) {
+        setFormState(prev => ({ 
+          ...prev, 
+          loading: false,
+          response: 'An error occurred while uploading files.'
+        }));
       }
     } else {
-      setResponse("You have not filled the form correctly.");
-      setLoading(false);
-    }
-  }
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const file_response = handleUploadFiles(Array.from(event.target.files), uploadedFiles, setFileLimit, setUploadedFiles);
-      console.log("File Response: " + file_response);
-      if (file_response !== true) {
-        setResponse("You are only allowed to upload pdf files.")
-      } else {
-        setResponse("")
-      }
+      console.log('Invalid form data');
+      setFormState(prev => ({ 
+        ...prev, 
+        loading: false,
+        response: 'You have not filled the form correctly.'
+      }));
     }
   };
-  
-  return (
-    <div className='flex justify-center gap-6 p-8'>
-      <form onSubmit={uploadCvs} className='relative pb-10 bg-white flex flex-col justify-center w-3/4 items-center gap-4 border-[#1A1D3F] border-8 border-t-3 border-b-0 rounded-lg'>
-        <h2 className='bg-[#1a1d3f] w-full p-4 text-center font-heading text-white text-xl font-medium'>
-          Lets fill the Form
-        </h2>
-        <div className='w-full p-5 pb-0'>
-          <Input labelText='Job Title' setInput={setJobTitle} />
-        </div>
-        <div className='w-full p-5 pb-0'>
-          <div className="relative w-full">
-            <textarea
-              className="resize-none bg-slate-100 focus:bg-white h-28 peer w-full font-sans font-normal outline-none transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 focus:border-t-transparent text-sm rounded-[7px] border-blue-gray-200 focus:border-indigo-500 px-2 py-2 border-t-transparent"
-              placeholder=" "
-              onChange={(e) => setJobDescription(e.target.value)}
-              required
-            ></textarea>
-            <label
-              className="flex w-full select-none pointer-events-none absolute left-0 font-normal truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-placeholder-shown:leading-[3.75] text-gray-400 peer-focus:text-indigo-500 before:border-blue-gray-200 peer-focus:before:!border-indigo-500 after:border-blue-gray-200 peer-focus:after:!border-indigo-500">
-              Job Description
-            </label>
-          </div>
-        </div>
-        <div className="m-4 mb-14">
-          <label htmlFor="example5" className="text-center w-full flex justify-center p-2 text-lg font-sans font-medium">Upload CVs</label>
-          <label className="mb-2 flex w-full cursor-pointer appearance-none items-center justify-center rounded-md border-2 border-dashed border-gray-200 p-6 transition-all hover:border-primary-300">
-            <div className="space-y-1 text-center">
-              <div className="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 text-gray-500">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-                </svg>
-              </div>
-              <div className="text-gray-600"><a href="#" className="font-medium text-primary-500 hover:text-primary-700">Click to upload</a></div>
-              <p className="text-sm text-gray-500">Pdf (max. 800x400px)</p>
-            </div>
-            <input id="example5"
-              type="file"
-              className="sr-only"
-              multiple
-              disabled={fileLimit}
-              onChange={handleFileChange}
+
+  const renderStepContent = () => {
+    switch (formState.step) {
+      case 1:
+        return (
+          <div className="w-full p-5">
+            <Input 
+              labelText="Job Title (optional)" 
+              is_required={false}
+              setInput={(value) => setFormState(prev => ({ ...prev, jobTitle: value }))}
             />
-          </label>
-          {uploadedFiles.length > 0 && <p className='text-lg m-3 text-center'>{uploadedFiles.length} CVs uploaded</p>}
-          {response && <p className='text-lg m-3 text-red-400 text-center'>{response}</p>}
-        </div>
-        {
-          loading ?
-            <Loader /> :
-            <div className='absolute bottom-10 z-40 m-2'>
-              <Button is_delete={false}>Analyze</Button>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="w-full p-5">
+            <div className="relative w-full">
+              <textarea
+                className="resize-none bg-slate-100 focus:bg-white h-28 peer w-full font-sans font-normal outline-none transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 focus:border-t-transparent text-sm rounded-[7px] border-blue-gray-200 focus:border-indigo-500 px-2 py-2 border-t-transparent"
+                placeholder=" "
+                value={formState.jobDescription}
+                onChange={(e) => setFormState(prev => ({ ...prev, jobDescription: e.target.value }))}
+                required
+              />
+              <label className="flex w-full select-none pointer-events-none absolute left-0 font-normal truncate peer-placeholder-shown:text-blue-gray-500 leading-tight peer-focus:leading-tight transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-placeholder-shown:leading-[3.75] text-gray-400 peer-focus:text-indigo-500 before:border-blue-gray-200 peer-focus:before:!border-indigo-500 after:border-blue-gray-200 peer-focus:after:!border-indigo-500">
+                Job Description (min. 15 non-space characters)
+              </label>
+              {formState.jobDescription.length > 0 && countNonWhitespace(formState.jobDescription) < 15 && (
+                <p className="mt-1 text-sm text-red-500">
+                  Please enter at least 15 non-space characters ({15 - countNonWhitespace(formState.jobDescription)} more needed)
+                </p>
+              )}
             </div>
-        }
-        <FormSvg />
-      </form>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="w-full max-w-2xl mx-auto p-5">
+            <div className="space-y-4">
+              <label className="block text-center text-lg font-medium text-gray-700">
+                Upload CVs
+              </label>
+              <div className="relative">
+                <label className="group flex flex-col items-center justify-center w-full h-48 
+                                border-2 border-dashed border-gray-300 rounded-lg
+                                transition-all hover:border-purple-500 cursor-pointer
+                                bg-gray-50 hover:bg-gray-100">
+                  <div className="space-y-2 text-center">
+                    <div className="mx-auto inline-flex h-12 w-12 items-center justify-center 
+                                  rounded-full bg-gray-200 group-hover:bg-gray-300">
+                      <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" 
+                           stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium text-purple-600 hover:text-purple-700">
+                        Click to upload
+                      </span>
+                      {' '}or drag and drop
+                    </div>
+                    <p className="text-xs text-gray-500">PDF files only</p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept=".pdf"
+                    disabled={formState.fileLimit}
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+              {formState.uploadedFiles.length > 0 && (
+                <div className="text-center text-sm text-gray-600">
+                  {formState.uploadedFiles.length} CV{formState.uploadedFiles.length !== 1 ? 's' : ''} uploaded
+                </div>
+              )}
+              {formState.response && (
+                <div className="text-center text-sm text-red-500">
+                  {formState.response}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+    }
+  };
+
+  const renderNavigation = () => {
+    if (formState.loading) return <Loader />;
+
+    return (
+      <div className="flex justify-between items-center w-full px-5 py-4">
+        {formState.step > 1 && (
+          <button
+            type="button"
+            onClick={() => handleStep(formState.step - 1)}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800 focus:outline-none
+                     transition-colors duration-200"
+          >
+            ← Back
+          </button>
+        )}
+        <div className={formState.step === 1 ? 'ml-auto' : ''}>
+          {formState.step === 3 ? (
+            <button
+              type="submit"
+              disabled={formState.uploadedFiles.length === 0}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg
+                       hover:bg-purple-700 focus:outline-none focus:ring-2 
+                       focus:ring-purple-500 focus:ring-offset-2
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       transition-colors duration-200"
+            >
+              Analyze CVs
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleStep(formState.step + 1)}
+              disabled={!canProceedToStep(formState.step + 1)}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg
+                       hover:bg-purple-700 focus:outline-none focus:ring-2 
+                       focus:ring-purple-500 focus:ring-offset-2
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       transition-colors duration-200"
+            >
+              Next →
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative bg-white max-w-4xl mx-auto">
+        <div className='flex flex-col justify-center items-center gap-2'>
+          <h2 className='relative font-heading text-4xl font-bold mt-4'>
+            Analyze Your CVs
+          </h2>
+          <p className='text-slate-500'>
+            The more you add, the more accurate your analysis will be. 
+          </p>
+        </div>
+        <form
+          onSubmit={uploadCvs}
+          className="bg-white rounded-xl shadow-lg overflow-hidden"
+        >
+          <div className="px-4 py-5 sm:p-6">
+            <Stepper step={formState.step} handleStep={handleStep} canProceed={canProceedToStep} />
+            {renderStepContent()}
+          </div>
+          {renderNavigation()}
+        </form>
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default UploadCvs
