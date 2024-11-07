@@ -1,50 +1,97 @@
 from typing import Annotated, Any, List
-from sqlmodel import select
+from sqlmodel import select, func
 from cv_checker_backend.controllers.user_controller import get_user_from_session
 from cv_checker_backend.models.job_models import Job, Cv, CvFeatures
 from fastapi import Depends, UploadFile, File, HTTPException, Form
 from cv_checker_backend.db.db_connector import DB_SESSION
 from cv_checker_backend.controllers.openai_controller import analyze_cv_by_openai
 from pypdf import PdfReader
+from cv_checker_backend.common import STATUS
+import re
 
-
-async def upload_job(session: DB_SESSION, job_title: str = Form(...), job_description: str = Form(...), cvs: List[UploadFile] = File(...)):
+async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_description: str = Form(...), cvs: List[UploadFile] = File(...), user: dict = Depends(get_user_from_session)):
+    if user["status"] is not STATUS["SUCCESS"]:
+        return user
     cv_tables: List[Cv] = []
     cvs_text = []
     print(job_title)
     print(job_description)
+    job_title = re.sub(" {2,}", " ", job_title.strip())
+    allJobs = session.exec(
+        select(Job).where(
+            Job.user_id == user["user_id"],
+            func.lower(Job.job_title) == job_title.lower()
+        )
+    ).all()
+    if any(allJobs):
+        return {
+            "status": STATUS["ERROR"],
+            "message": "Job already exists with this title."
+        }
+        
     for cv in cvs:
         try:
             reader = PdfReader(cv.file)
             pages = reader.pages
             pdf_text = "".join(str(page.extract_text()) for page in pages)
-            print(f"File Data: {str(pdf_text)}")
+            # print(f"File Data: {str(pdf_text)}")
         except Exception as e:
             print("Error while fetching data from CV: ", e)
-            raise HTTPException(status_code=400, detail=str(e))
+            return {
+                "status": STATUS["ERROR"],
+                "message": "Problem has been occurred while fetching data from CV."
+            }
         cvs_text.append(pdf_text)
-    cvs_results: List[dict] = analyze_cv_by_openai(
+    print(cvs_text)
+    response: dict[str, Any] = analyze_cv_by_openai(
         job_title, job_description, cvs_text)
-    print(cvs_results)
-    # for cv_data in cvs_results:
-    #     cv_feature_table = CvFeatures(**cv_data["features"])
-    #     cv_table = Cv(
-    #         candidate_name=cv_data["candidate_name"],
-    #         candidate_email=cv_data["candidate_email"],
-    #         is_recommended=cv_data["is_recommended"],
-    #         recommendation_points=cv_data["recommendation_points"],
-    #         cv_features=cv_feature_table
-    #     )
-    #     cv_tables.append(cv_table)
-    # job_table = Job(job_title=job_title,
-    #                 job_description=job_description, cvs=cv_tables)
-    # session.add(job_table)
-    # session.commit()
-    # session.refresh(job_table)
-    return {
-        "message" : "Your candidate's CV has been successfully analyze with the specific job description.",
-        # "job_id":  job_table.job_id
-        }
+    print("Result: ", response)
+    
+    if response["status"] is not STATUS["SUCCESS"]:
+        return response
+    else:
+        try:
+            results = response["data"]
+            if (results and len(results) > 0):
+                for cv_data in results:
+                    cv_feature_table = CvFeatures(**cv_data["features"])
+                    cv_table = Cv(
+                        candidate_name=cv_data["candidate_name"],
+                        candidate_email=cv_data["candidate_email"],
+                        is_recommended=cv_data["is_recommended"],
+                        recommendation_points=cv_data["recommendation_points"],
+                        cv_features=cv_feature_table
+                    )
+                    cv_tables.append(cv_table)
+                if len(cv_tables) ==0:
+                    return {
+                        "status": STATUS["ERROR"],
+                        "message": "No valid CVs found.",
+                    }
+                job_table = Job(job_title=job_title,
+                                job_description=job_description, 
+                                cvs=cv_tables,
+                                user_id=user["user_id"]
+                                )
+                session.add(job_table)
+                session.commit()
+                session.refresh(job_table)
+                return {
+                    "status": STATUS["SUCCESS"],
+                    "message": "Your candidate's CV has been successfully analyzed.",
+                    "job_id":  job_table.job_id
+                }
+            else:
+                return {
+                    "status": STATUS["ERROR"],
+                    "message": "Problem has been occurred while analyzing CVs.",
+                }
+        except Exception as e:
+            print("Error while uploading job: ", e)
+            return {
+                "status": STATUS["ERROR"],
+                "message": "Problem has been occurred while uploading job.",
+            }
 
 
 def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
@@ -60,7 +107,7 @@ def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], ses
                 "cv_count": cvs
             }
         )
-    return "all_jobs"
+    return all_jobs
 
 def get_all_applicants(user_id: str, session: DB_SESSION):
     jobs = session.exec(select(Job).where(Job.user_id == user_id)).all()
