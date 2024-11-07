@@ -4,15 +4,17 @@ interface InputType {
     labelText: string,
     otherClasses?: string,
     setInput: (value: string) => void
+    input_value?: string,
     is_required?: boolean
 }
 
-const Input = ({ labelText, otherClasses, setInput, is_required }: InputType) => {
+const Input = ({ labelText, otherClasses, setInput, input_value, is_required }: InputType) => {
     return (
         <div className="relative h-10 w-full">
             <input
                 className="peer w-full focus:bg-white h-full bg-slate-100 text-gray-700 font-sans font-normal outline outline-0 focus:outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-purple-700"
                 placeholder=" "
+                value={input_value}
                 onChange={(e) =>setInput(e.target.value)}
                 required={is_required? is_required : false}
                 />

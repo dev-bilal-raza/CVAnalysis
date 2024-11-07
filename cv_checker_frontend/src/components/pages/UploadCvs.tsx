@@ -8,9 +8,11 @@ import { FormSvg } from '../common/Svgs'
 import { useRouter } from 'next/navigation'
 import Loader from '../layout/loader/Loader'
 import { GridPattern } from '../ui/GridPattern'
+import { toast } from 'react-hot-toast';
+import { STATUS } from '@/common/constants'
 
-const Stepper = ({ step, handleStep, canProceed }: { 
-  step: number; 
+const Stepper = ({ step, handleStep, canProceed }: {
+  step: number;
   handleStep: (step: number) => void;
   canProceed: (step: number) => boolean;
 }) => {
@@ -24,8 +26,8 @@ const Stepper = ({ step, handleStep, canProceed }: {
     <div className="flex justify-center w-full py-8 mb-4">
       <div className="relative flex justify-between w-full max-w-3xl px-4">
         <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200" />
-        
-        <div 
+
+        <div
           className="absolute top-6 left-0 h-1 bg-purple-500 transition-all duration-500 ease-in-out"
           style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
         />
@@ -42,8 +44,8 @@ const Stepper = ({ step, handleStep, canProceed }: {
               className={`
                 relative z-10 flex items-center justify-center w-12 h-12 rounded-full
                 transition-all duration-300 ease-in-out transform hover:scale-110
-                ${step >= s.number 
-                  ? 'bg-purple-500 text-white shadow-lg hover:bg-purple-600' 
+                ${step >= s.number
+                  ? 'bg-purple-500 text-white shadow-lg hover:bg-purple-600'
                   : 'bg-white border-2 border-gray-200 text-gray-400 hover:border-gray-300'
                 }
                 ${step === s.number ? 'ring-4 ring-purple-200' : ''}
@@ -52,7 +54,7 @@ const Stepper = ({ step, handleStep, canProceed }: {
             >
               <span className="font-bold text-lg">{s.number}</span>
             </button>
-            
+
             <div className={`
               absolute top-14 mt-4 text-sm font-medium whitespace-nowrap
               transition-colors duration-300
@@ -75,7 +77,7 @@ const UploadCvs = () => {
     uploadedFiles: [] as File[],
     fileLimit: false,
     response: '',
-    loading: false
+    loading: false,
   });
 
   const router = useRouter();
@@ -87,22 +89,23 @@ const UploadCvs = () => {
 
   const canProceedToStep = (targetStep: number): boolean => {
     if (targetStep <= formState.step) return true;
-    if (targetStep === 2) return true;
+    if (targetStep === 2) return countNonWhitespace(formState.jobTitle) >= 3;
     if (targetStep === 3) return countNonWhitespace(formState.jobDescription) >= 15;
     return false;
   };
 
   const handleStep = (newStep: number) => {
+    console.log('New step: ', newStep);
     if (canProceedToStep(newStep)) {
-      setFormState(prev => ({ ...prev, step: newStep }));
+      setFormState(prev => ({ ...prev, step: newStep, response: ""}));
     }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-
+    if (!event.currentTarget.files) return;
+    // event.();
     const fileResponse = handleUploadFiles(
-      Array.from(event.target.files),
+      Array.from(event.currentTarget.files),
       formState.uploadedFiles,
       (limit: boolean) => setFormState(prev => ({ ...prev, fileLimit: limit })),
       (files: File[]) => setFormState(prev => ({ ...prev, uploadedFiles: files }))
@@ -116,13 +119,14 @@ const UploadCvs = () => {
 
   const uploadCvs = async (e: FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted');
     if (formState.step !== 3) return;
 
     setFormState(prev => ({ ...prev, loading: true, response: '' }));
 
-    const isValid = formState.uploadedFiles.length > 0 && 
-                   formState.jobTitle && 
-                   countNonWhitespace(formState.jobDescription) >= 15;
+    const isValid = formState.uploadedFiles.length > 0 &&
+      formState.jobTitle &&
+      countNonWhitespace(formState.jobDescription) >= 15;
 
     if (isValid) {
       const formData = new FormData();
@@ -134,20 +138,67 @@ const UploadCvs = () => {
 
       try {
         const response = await add_job(formData);
-        if (response) {
+        console.log('Response: ', response);
+        if (response?.data.status === STATUS.SUCCESS) {
           setFormState(prev => ({ ...prev, loading: false }));
+          toast.success(response.data.message,
+            {
+              style: {
+                border: '1px solid #039427',
+                padding: '16px',
+                color: 'black',
+              },
+              iconTheme: {
+                primary: '#039427',
+                secondary: '#FFFAEE',
+              },
+            }
+          );
+          // setTimeout(() => router.push('/'), 2000);
+        } else {
+          toast.error(response?.data.message,
+            {
+              style: {
+                border: '1px solid #f71b31',
+                padding: '16px',
+                color: 'black',
+              },
+              iconTheme: {
+                primary: '#f71b31',
+                secondary: '#FFFAEE',
+              },
+            }
+          )
+          setFormState(prev => ({
+            ...prev,
+            loading: false,
+            response: response?.data.message
+          }));
         }
       } catch (error) {
-        setFormState(prev => ({ 
-          ...prev, 
+        setFormState(prev => ({
+          ...prev,
           loading: false,
           response: 'An error occurred while uploading files.'
         }));
+        toast.error('An error occurred while uploading files.',
+          {
+            style: {
+              border: '1px solid #713200',
+              padding: '16px',
+              color: '#713200',
+            },
+            iconTheme: {
+              primary: '#713200',
+              secondary: '#FFFAEE',
+            },
+          }
+        );
       }
     } else {
       console.log('Invalid form data');
-      setFormState(prev => ({ 
-        ...prev, 
+      setFormState(prev => ({
+        ...prev,
         loading: false,
         response: 'You have not filled the form correctly.'
       }));
@@ -159,11 +210,17 @@ const UploadCvs = () => {
       case 1:
         return (
           <div className="w-full p-5">
-            <Input 
-              labelText="Job Title (optional)" 
+            <Input
+              labelText="Job Title (min. 3 non-space characters)"
               is_required={false}
+              input_value={formState.jobTitle}
               setInput={(value) => setFormState(prev => ({ ...prev, jobTitle: value }))}
             />
+            {formState.jobTitle.length > 0 && countNonWhitespace(formState.jobTitle) < 3 && (
+              <p className="mt-1 text-sm text-red-500">
+                Please enter at least 3 non-space characters ({3 - countNonWhitespace(formState.jobTitle)} more needed)
+              </p>
+            )}
           </div>
         );
 
@@ -205,10 +262,10 @@ const UploadCvs = () => {
                   <div className="space-y-2 text-center">
                     <div className="mx-auto inline-flex h-12 w-12 items-center justify-center 
                                   rounded-full bg-gray-200 group-hover:bg-gray-300">
-                      <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" 
-                           stroke="currentColor">
+                      <svg className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                              d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
                     </div>
                     <div className="text-sm text-gray-600">
@@ -246,7 +303,15 @@ const UploadCvs = () => {
   };
 
   const renderNavigation = () => {
-    if (formState.loading) return <Loader />;
+    if (formState.loading) return (
+      <div className='w-full flex flex-col justify-center items-center m-2'>
+        <Loader />
+        <p className='text-slate-600 font-para'>
+          This may take a moment, but it’ll be faster than waiting for a human to handle it.
+        </p>
+      </div>
+    );
+    
 
     return (
       <div className="flex justify-between items-center w-full px-5 py-4">
@@ -274,18 +339,21 @@ const UploadCvs = () => {
               Analyze CVs
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => handleStep(formState.step + 1)}
-              disabled={!canProceedToStep(formState.step + 1)}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg
+            <div>
+
+              <button
+                type="button"
+                onClick={() => handleStep(formState.step + 1)}
+                disabled={!canProceedToStep(formState.step + 1)}
+                className="px-6 py-2 bg-purple-600 text-white rounded-lg
                        hover:bg-purple-700 focus:outline-none focus:ring-2 
                        focus:ring-purple-500 focus:ring-offset-2
                        disabled:opacity-50 disabled:cursor-not-allowed
                        transition-colors duration-200"
-            >
-              Next →
-            </button>
+              >
+                Next →
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -300,7 +368,7 @@ const UploadCvs = () => {
             Analyze Your CVs
           </h2>
           <p className='text-slate-500'>
-            The more you add, the more accurate your analysis will be. 
+            The more you add, the more accurate your analysis will be.
           </p>
         </div>
         <form
