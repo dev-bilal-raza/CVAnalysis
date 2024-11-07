@@ -13,27 +13,27 @@ oauth = OAuth()
 
 # Register Google OAuth
 oauth.register(
-    name='google',
+    name="google",
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope': 'openid profile email'},
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid profile email"},
 )
 
 # Register GitHub OAuth
 oauth.register(
-    name='github',
+    name="github",
     client_id=GITHUB_CLIENT_ID,
     client_secret=GITHUB_CLIENT_SECRET,
-    authorize_url='https://github.com/login/oauth/authorize',
-    access_token_url='https://github.com/login/oauth/access_token',
-    client_kwargs={'scope': 'user:email'},
+    authorize_url="https://github.com/login/oauth/authorize",
+    access_token_url="https://github.com/login/oauth/access_token",
+    client_kwargs={"scope": "user:email"},
 )
 
 
 @authRoute.get("/api/v1/auth/google/login")
 async def google_login(request: Request):
-    redirect_uri = f'{BACKEND_URL}/api/v1/auth/google/callback'
+    redirect_uri = f"{BACKEND_URL}/api/v1/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @authRoute.get("/api/v1/auth/google/callback")
@@ -51,23 +51,23 @@ async def google_callback(request: Request, session: DB_SESSION):
     # Debugging: Print user details
     if user:
         user_data = {
-        "user_name": user['name'],
-        "email": user['email'],
-        "avatar_url": user['picture'],
-        "token": token['id_token'],
+        "user_name": user["name"],
+        "email": user["email"],
+        "avatar_url": user["picture"],
+        "token": token["id_token"],
         "is_active": True
         }
         print("User details:", user_data)
         response = create_user(user_data, session)
         # print("Response while creating user in database: " + response)
-        request.session['user'] = dict(user)
+        request.session["user"] = dict(user)
 
     return RedirectResponse(url=FRONTEND_URL)
 
 
 @authRoute.get("/api/v1/auth/github/login")
 async def github_login(request: Request):
-    redirect_uri = f'{BACKEND_URL}/api/v1/auth/github/callback'
+    redirect_uri = f"{BACKEND_URL}/api/v1/auth/github/callback"
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
 @authRoute.get("/api/v1/auth/github/callback")
@@ -79,25 +79,25 @@ async def github_callback(request: Request, session: DB_SESSION):
                 # Use the token to fetch user details
         async with httpx.AsyncClient() as client:
             # Fetch basic user details
-            response = await client.get('https://api.github.com/user', headers={'Authorization': f"Bearer {token['access_token']}"})
+            response = await client.get("https://api.github.com/user", headers={"Authorization": f"Bearer {token["access_token"]}"})
             user_info = response.json()
             print("User details:", user_info)
 
-            # Fetch email separately if it's not included in the user info
-            if not user_info.get('email'):
-                email_response = await client.get('https://api.github.com/user/emails', headers={'Authorization': f"Bearer {token['access_token']}"})
+            # Fetch email separately if it"s not included in the user info
+            if not user_info.get("email"):
+                email_response = await client.get("https://api.github.com/user/emails", headers={"Authorization": f"Bearer {token["access_token"]}"})
                 emails = email_response.json()
                 print("Email Reponse: ", emails)
                 # Find the primary email
-                primary_email = next((email['email'] for email in emails if email['primary']), None)
-                user_info['email'] = primary_email
+                primary_email = next((email["email"] for email in emails if email["primary"]), None)
+                user_info["email"] = primary_email
 
         if user_info:
             # Now you can store user information in your database
             user_data = {
-                "user_name": user_info.get('login'),
-                "avatar_url": user_info.get('avatar_url'),
-                "email": user_info.get('email') , # Include email now
+                "user_name": user_info.get("login"),
+                "avatar_url": user_info.get("avatar_url"),
+                "email": user_info.get("email") , # Include email now
                 "token": token["access_token"],
                 "is_active": True
             }
@@ -106,7 +106,7 @@ async def github_callback(request: Request, session: DB_SESSION):
             print("Response while creating user in database: " + user_response)
 
             # Store user information in the session
-            request.session['user'] = user_info
+            request.session["user"] = user_info
             return RedirectResponse(url=FRONTEND_URL)  # Redirect to frontend
         else:
             raise ValueError("No user info found in the response")

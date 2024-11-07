@@ -5,12 +5,15 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuth # type: ignore
 from sqlmodel import select
+from cv_checker_backend.common import STATUS
 authSchema = OAuth2PasswordBearer(tokenUrl="/token")
 oauth = OAuth()
 
 def create_user(user_data: dict, session: DB_SESSION):
-    try:        
+    try:  
         print("User Data: ", user_data)
+        if not (user_data.get("email") and user_data.get("user_name") and user_data.get("token")):
+            return {"status": STATUS["BAD_REQUEST"], "message": "Please provide valid user data."}
         user_exist = session.exec(select(User).where(User.email == user_data["email"])).one_or_none()
         if user_exist:
             user_exist.email = user_data["email"]
@@ -23,23 +26,23 @@ def create_user(user_data: dict, session: DB_SESSION):
             user = User(**user_data)
             session.merge(user)
         session.commit()
-        return "User has been successfully created."
+        return {"status": STATUS["SUCCESS"], "message": "User has been successfully created."}
     except Exception as e:
         print("ExceptionError: ", e)
-        raise HTTPException(status_code=500, detail=str(e))
-    
-    
+        return {"status": STATUS["INTERNAL_SERVER_ERROR"], "message": "Something went wrong."}        
+
 def get_user_from_session(request: Request, session: DB_SESSION):
     try:
         user_data = request.session.get("user")
         if not user_data:
-            raise HTTPException(status_code=401, detail="You are not authorized user")
-        user_email = user_data.get('email') 
+            return {"status": STATUS["NOT_AUTHORIZED"], "message": "You are not authorized user"}
+        user_email = user_data.get("email") 
         user_in_db = session.exec(select(User).where(User.email == user_email)).one_or_none()
         if not user_in_db:
-            raise HTTPException(status_code=404, detail="User not found in the database")
+            return {"status": STATUS["NOT_AUTHORIZED"], "message": "You are not authorized user"}
             
-        return {**user_in_db.model_dump()}
+        return {"status": STATUS["SUCCESS"], **user_in_db.model_dump()}
     except Exception as e:
         print("ExceptionError: ", e)
-        raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+        return {"status": STATUS["INTERNAL_SERVER_ERROR"], "message": "Something went wrong."}        
+        

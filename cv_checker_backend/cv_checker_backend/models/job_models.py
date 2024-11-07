@@ -33,3 +33,10 @@ class CvFeatures(SQLModel, table=True):
     education: str
     experience: str
     cv: Cv | None = Relationship(back_populates="cv_features")
+
+class Reviews(BaseModel):
+    user_name: str
+    field: str
+    review: str
+    rating: int
+    is_allowed: bool = Field(default=False) 
