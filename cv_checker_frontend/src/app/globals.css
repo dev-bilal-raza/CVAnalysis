@@ -27,3 +27,25 @@
     background: #373c6e;
     cursor: auto;
 }
+.text-tooltip::after {
+    content: attr(aria-valuetext);
+    position: absolute;
+    background: #333;
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 250ms ease-in, visibility 250ms ease-in;
+    z-index: 30;
+  }
+  
+  .text-tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }

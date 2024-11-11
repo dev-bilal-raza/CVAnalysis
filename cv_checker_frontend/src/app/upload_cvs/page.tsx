@@ -7,8 +7,8 @@ const page = () => {
     return (
         <main>
             <Header/>
-            <section className='min-h-screen max-w-screen mx-auto'>
-                <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)] ">
+            <section className=''>
+                <div className="absolute h-[110%] inset-0 [mask-image:radial-gradient(ellipse_at_top,white,transparent)] ">
                     <GridPattern />
                 </div>
                 <UploadCvs />

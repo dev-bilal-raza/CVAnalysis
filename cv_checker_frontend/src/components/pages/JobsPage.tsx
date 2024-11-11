@@ -51,34 +51,51 @@ const AllJobs = () => {
                         </div>
                         :
                         // Display all jobs in a table format
-                        <div>
-                            <div className='large-screen w-full md:flex hidden flex-col text-black p-4 rounded-t-xl md:bg-black/15'>
-                                <h3 className='font-heading font-semibold text-center text-2xl sm:text-3xl md:text-4xl pb-4'>ALL JOBS</h3>
-                                <div className="bg-black rounded-t-xl border-2 md:block hidden">
-                                    <div className="text-white p-3 flex flex-row justify-between w-[70%]">
-                                        <h3 className="font-heading text-xl text-right font-medium w-[16%]">S#</h3>
-                                        <h3 className="font-heading text-xl text-left font-medium w-[15%]">Role</h3>
-                                        <h3 className="font-heading text-xl font-medium">CV Screened</h3>
+                        <div className='w-full flex justify-center items-center'>
+                            <div className='w-4/5 bg-black/20 rounded-lg'>
+                                <div className='w-full flex justify-between rounded-t-lg py-3 px-6 bg-gray-400'>
+                                    <h3 className='font-heading font-semibold text-black text-center text-2xl sm:text-3xl md:text-4xl'>ALL JOBS
+                                    </h3>
+                                    <div>
+
                                     </div>
                                 </div>
-                                <div className='border-2 border-t-0 max-h-screen overflow-auto'>
-                                    {jobs?.map((job, index) => (
-                                        <div key={index} className={`p-2 pt-6 ${index % 2 !== 0 ? "bg-gradient-to-tl from-slate-300 via-[#7d82b9] to-[#6f72a8]" : "bg-white"}`}>
-                                            <div className='w-full flex justify-around'>
+                                <div className='w-full p-4'>
+                                    <div className="grid grid-cols-8 p-3 gap-4 bg-black rounded-t-xl border-2 text-white">
+                                        <h3 className="font-heading text-xl font-medium">S#</h3>
+                                        <h3 className="col-span-2 font-heading text-xl font-medium">Role</h3>
+                                        <h3 className="text-left font-heading text-xl font-medium">CV Screened</h3>
+                                        <h3 className="col-span-4 font-heading text-xl font-medium">Created At</h3>
+                                    </div>
+                                    <div className='border-2 w-full border-t-0 max-h-screen'>
+                                        {jobs?.map((job, index) => (
+                                            <div key={index} className={`grid grid-cols-8 gap-4 p-2 pt-6 ${index % 2 !== 0 ? "bg-[#242151] text-white" : "bg-white text-black"}`}>
                                                 <h4 className='lg:text-xl text-[17px]'>
                                                     {index < 10 ? "0" + (index + 1) : index + 1}
                                                 </h4>
-                                                <h4 className='w-1/6 text-left font-sans lg:text-xl text-[17px]'>{job.job_title}</h4>
-                                                <h4 className='text-left font-sans lg:text-xl text-[17px]'>{job.cv_count}</h4>
+                                                <h4 aria-valuetext={job.job_title} className='col-span-2 text-nowrap text-tooltip relative font-sans lg:text-xl text-[17px]'>{job.job_title.length < 9 ? job.job_title : job.job_title.slice(0, 9) + " ..."}</h4>
+                                                <h4 className='font-sans lg:text-xl text-[17px]'>{job.cv_count}</h4>
+                                                <h4 className='font-sans lg:text-xl text-[17px]'>{job.cv_count}</h4>
+                                                <Link className='w-full col-span-2' href={`/analyze_cv/${job?.job_id}`}>
+                                                    <button
+                                                        type="button"
+                                                        className={`p-2 ${index % 2 !== 0 ? "": ""}bg-black rounded-lg hover:bg-gray-950  text-white md:text-base text-sm text-nowrap duration-1000`}
+                                                    >
+                                                        Open the description
+                                                    </button>
+                                                </Link>
                                                 <Link href={`/analyze_cv/${job?.job_id}`}>
-                                                    <Button is_delete={false}>
-                                                        Analyze
-                                                    </Button>
+                                                    <button
+                                                        type="button"
+                                                        className={`px-2 sm:px-4 md:px-6 py-2 sm:text-lg ${index % 2 !== 0 ? "": ""}bg-purple-600 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white md:text-base text-sm  hover:text-black hover:bg-transparent duration-1000`}
+                                                    >
+                                                        Next →
+                                                    </button>
                                                 </Link>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                </div>    
                             </div>
                             <div className='small-screen md:hidden text-black'>
                                 <h3 className='font-heading font-semibold text-center text-2xl sm:text-3xl md:text-4xl pb-4'>ALL JOBS</h3>
@@ -95,9 +112,12 @@ const AllJobs = () => {
                                                         <h4 className='text-left font-sans text-sm sm:text-[16px]'>CVs: </h4>
                                                         <h4 className='text-left font-sans text-sm sm:text-[16px]'>{job.cv_count}</h4>
                                                     </div>
-                                                    <Button is_delete={false}>
-                                                        Analyze
-                                                    </Button>
+                                                    <button
+                                                        type="button"
+                                                        className="px-2 sm:px-4 md:px-6 py-2 text-sm sm:text-lg bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                    >
+                                                        Next →
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
