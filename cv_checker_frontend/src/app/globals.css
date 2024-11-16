@@ -10,23 +10,24 @@
 ::-webkit-scrollbar {
     width: 8px;
 }
- 
+
 /* Track */
 ::-webkit-scrollbar-track {
     background: #888;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: #1A1D3F;
     border-radius: 5px;
 }
- 
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #373c6e;
     cursor: auto;
 }
+
 .text-tooltip::after {
     content: attr(aria-valuetext);
     position: absolute;
@@ -35,17 +36,50 @@
     font-size: 14px;
     padding: 5px 6px;
     border-radius: 4px;
-    top: 100%;
-    left: 50%;
+    bottom: 100%;
+    left: 80%;
     transform: translateX(-50%);
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 250ms ease-in, visibility 250ms ease-in;
+    transition: opacity 250ms ease-in-out, visibility 250ms ease-in-out;
     z-index: 30;
-  }
-  
-  .text-tooltip:hover::after {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+
+}
+
+.text-tooltip:hover::after {
     opacity: 1;
     visibility: visible;
-  }
+}
+
+/* Media queries for responsive design */
+@media (max-width: 340px) {
+    .text-tooltip::after {
+        max-width: 200px;
+        left: 100%;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 640px) {
+    .text-tooltip::after {
+        font-size: 12px;
+        padding: 4px 5px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .text-tooltip::after {
+        font-size: 13px;
+        padding: 5px 6px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .text-tooltip::after {
+        font-size: 14px;
+        padding: 6px 8px;
+    }
+}

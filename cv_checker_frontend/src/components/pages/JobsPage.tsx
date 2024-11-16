@@ -4,6 +4,12 @@ import Button from '../common/Button';
 import Loader from '../layout/loader/Loader';
 import Link from 'next/link';
 import { get_aLL_jobs } from '../api_calls/job_calls';
+import { STATUS } from '@/common/constants';
+import { redirect } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Container from '../layout/Container';
 
 interface Jobs {
     job_id: number,
@@ -16,15 +22,33 @@ const AllJobs = () => {
     const [loading, setLoading] = useState(true);
     const [jobs, setJobs] = useState<Jobs[]>([]);
     const [errMsg, setErrMsg] = useState<string | null>(null);
+    const router = useRouter();
     useEffect(() => {
         // Fetch jobs data from the FastAPI backend
         const fetch_jobs = async () => {
-            const jobs = await get_aLL_jobs()
-            console.log("Jobs: ", jobs);
+            const response = await get_aLL_jobs()
+            console.log("Jobs: ", response);
 
-            if (jobs?.status === 200) {
-                setJobs(jobs.data)
+            if (response?.data.status === STATUS.SUCCESS) {
+                setJobs(response.data.jobs)
                 setLoading(false)
+            } else if (response?.data.status === STATUS.NOT_AUTHORIZED) {
+                toast.error(response?.data.message,
+                    {
+                        style: {
+                            border: '1px solid #f71b31',
+                            padding: '16px',
+                            color: 'black',
+                        },
+                        iconTheme: {
+                            primary: '#f71b31',
+                            secondary: '#FFFAEE',
+                        },
+                    }
+                )
+                setTimeout(() => {
+                    router.push('/register')
+                }, 4000)
             }
             else {
                 setErrMsg("Failed to fetch jobs")
@@ -36,96 +60,85 @@ const AllJobs = () => {
     }, []);
 
     return (
-        <div>
-            {
-                loading ?
-                    <div className='flex justify-center items-center w-full h-80'>
-                        <Loader />
-                    </div>
-                    :
-                    jobs.length === 0 ?
-                        <div className='flex justify-center items-center w-full h-80 text-black'>
-                            <h3 className='text-4xl font-heading font-semibold'>
-                                Could not find any jobs.
-                            </h3>
+        <div className='my-6'>
+            <Container>
+                {
+                    loading ?
+                        <div className='flex justify-center items-center w-full h-80'>
+                            <Loader />
                         </div>
                         :
-                        // Display all jobs in a table format
-                        <div className='w-full flex justify-center items-center'>
-                            <div className='w-4/5 bg-black/20 rounded-lg'>
-                                <div className='w-full flex justify-between rounded-t-lg py-3 px-6 bg-gray-400'>
-                                    <h3 className='font-heading font-semibold text-black text-center text-2xl sm:text-3xl md:text-4xl'>ALL JOBS
-                                    </h3>
-                                    <div>
-
-                                    </div>
-                                </div>
-                                <div className='w-full p-4'>
-                                    <div className="grid grid-cols-8 p-3 gap-4 bg-black rounded-t-xl border-2 text-white">
-                                        <h3 className="font-heading text-xl font-medium">S#</h3>
-                                        <h3 className="col-span-2 font-heading text-xl font-medium">Role</h3>
-                                        <h3 className="text-left font-heading text-xl font-medium">CV Screened</h3>
-                                        <h3 className="col-span-4 font-heading text-xl font-medium">Created At</h3>
-                                    </div>
-                                    <div className='border-2 w-full border-t-0 max-h-screen'>
-                                        {jobs?.map((job, index) => (
-                                            <div key={index} className={`grid grid-cols-8 gap-4 p-2 pt-6 ${index % 2 !== 0 ? "bg-[#242151] text-white" : "bg-white text-black"}`}>
-                                                <h4 className='lg:text-xl text-[17px]'>
-                                                    {index < 10 ? "0" + (index + 1) : index + 1}
-                                                </h4>
-                                                <h4 aria-valuetext={job.job_title} className='col-span-2 text-nowrap text-tooltip relative font-sans lg:text-xl text-[17px]'>{job.job_title.length < 9 ? job.job_title : job.job_title.slice(0, 9) + " ..."}</h4>
-                                                <h4 className='font-sans lg:text-xl text-[17px]'>{job.cv_count}</h4>
-                                                <h4 className='font-sans lg:text-xl text-[17px]'>{job.cv_count}</h4>
-                                                <Link className='w-full col-span-2' href={`/analyze_cv/${job?.job_id}`}>
-                                                    <button
-                                                        type="button"
-                                                        className={`p-2 ${index % 2 !== 0 ? "": ""}bg-black rounded-lg hover:bg-gray-950  text-white md:text-base text-sm text-nowrap duration-1000`}
-                                                    >
-                                                        Open the description
-                                                    </button>
-                                                </Link>
-                                                <Link href={`/analyze_cv/${job?.job_id}`}>
-                                                    <button
-                                                        type="button"
-                                                        className={`px-2 sm:px-4 md:px-6 py-2 sm:text-lg ${index % 2 !== 0 ? "": ""}bg-purple-600 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white md:text-base text-sm  hover:text-black hover:bg-transparent duration-1000`}
-                                                    >
-                                                        Next →
-                                                    </button>
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>    
+                        jobs.length === 0 ?
+                            <div className='flex justify-center items-center w-full h-80 text-black'>
+                                <h3 className='text-4xl font-heading font-semibold'>
+                                    Could not find any jobs.
+                                </h3>
                             </div>
-                            <div className='small-screen md:hidden text-black'>
-                                <h3 className='font-heading font-semibold text-center text-2xl sm:text-3xl md:text-4xl pb-4'>ALL JOBS</h3>
-                                <div className='grid sm:grid-cols-2 grid-cols-1 gap-5'>
-                                    {jobs?.map((job, index) => (
-                                        <div key={index} className="border-8 border-black rounded-md p-2 shadow-[0px_0px_10px_0px_#282553]">
-                                            <div className='flex gap-2 w-full'>
-                                                <h4 className='text-10px sm:text-[13px] h-fit sm:p-2 p-1 rounded-full bg-black text-white'>
-                                                    {index < 10 ? "0" + (index + 1) : index + 1}
-                                                </h4>
-                                                <div className='w-full flex flex-col justify-center items-center gap-2 p-3 pt-4'>
-                                                    <h4 className='font-sans text-[15px] sm:text-[17px] text-center'>{job.job_title}</h4>
-                                                    <div className='flex gap-1 mb-2'>
-                                                        <h4 className='text-left font-sans text-sm sm:text-[16px]'>CVs: </h4>
-                                                        <h4 className='text-left font-sans text-sm sm:text-[16px]'>{job.cv_count}</h4>
+                            :
+                            // Display all jobs in a table formats
+                            <div className='w-full text-black'>
+                                <div className='sm:w-3/4 mx-auto'>
+                                    <div className='flex flex-col gap-3'>
+                                        <h3 className='font-heading font-semibold text-black text-center text-2xl sm:text-3xl md:text-4xl'>ALL JOBS
+                                        </h3>
+                                        {/* search bar */}
+                                        <div className='bg-[#F0E8F5] p-2.5 px-4 rounded-xl flex items-end gap-2'>
+                                            <Image src='/SearchIcon.png' alt='search' width={19} height={19} />
+                                            <input
+                                                type="text"
+                                                placeholder="Search for jobs"
+                                                className="w-full placeholder-[#1E1B4B] border-none outline-none bg-transparent"
+                                            />
+                                        </div>
+                                        <div className='w-full'>
+                                            <div className=''>
+                                                {jobs?.map((job, index) => (
+                                                    <div key={index} className={`w-full flex my-8 justify-between ${index % 2 !== 0 ? "" : ""}`}>
+                                                        <div className='flex gap-2 items-start'>
+                                                            <div className='hidden sm:block p-3 bg-[#F0E8F5] rounded-md'>
+                                                                <Image src={"/JobBag.png"} alt={`0${index + 1}`} width={23} height={23} />
+                                                            </div>
+                                                            <div>
+                                                                <h3 aria-valuetext={job.job_title} className='exsmall:block hidden text-tooltip font-heading font-medium relative'>
+                                                                    {job.job_title.length > 20 ? job.job_title.slice(0, 20) + "..." : job.job_title}
+                                                                </h3>
+                                                                <h3 aria-valuetext={job.job_title} className='exsmall:hidden block text-tooltip font-heading font-medium relative'>
+                                                                    {job.job_title.length > 10 ? job.job_title.slice(0, 10) + "..." : job.job_title}
+                                                                </h3>
+                                                                <h5 className='font-para text-gray-700 text-sm exsmall:text-base font-light'>
+                                                                    Applictions: {job.cv_count < 10 ? "0" + job.cv_count : job.cv_count}
+                                                                </h5>
+                                                                <h5 className='font-para text-sm text-blue-600 hover:text-blue-500 cursor-pointer font-light'>
+                                                                    View Description
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex gap-4 items-center'>
+                                                            <div className='p-2 px-4 md:px-6 border border-[#1E1B4B] rounded-md'>
+                                                                <Image src={"/TrashIcon.png"} alt='Delete Job' width={16} height={16} />
+                                                            </div>
+                                                            <Button is_delete={false}>
+                                                                View CVs
+                                                            </Button>
+                                                        </div>
                                                     </div>
-                                                    <button
-                                                        type="button"
-                                                        className="px-2 sm:px-4 md:px-6 py-2 text-sm sm:text-lg bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                                    >
-                                                        Next →
-                                                    </button>
-                                                </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    ))}
+                                    </div>
+                                </div>
+                                <div className='fixed bottom-0 w-full bg-white '>
+                                    <div className='flex justify-center items-center w-full'>
+                                        <Link href='/add-job'>
+                                            <Button is_delete={false}>
+                                                Add Job
+                                            </Button>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-            }
+                }
+            </Container>
         </div>
     )
 }

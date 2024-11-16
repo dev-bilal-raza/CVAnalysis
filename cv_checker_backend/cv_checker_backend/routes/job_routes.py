@@ -12,7 +12,7 @@ def add_job(message: Annotated[str, Depends(upload_job)]):
         return message
 
 
-@jobRoute.get("/api/v1/get_all_jobs", response_model=list[dict])
+@jobRoute.get("/api/v1/get_all_jobs", response_model=dict)
 def read_all_jobs(all_jobs: Annotated[dict, Depends(get_all_jobs)]):
     print(all_jobs)
     return all_jobs

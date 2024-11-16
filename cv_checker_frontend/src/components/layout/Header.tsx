@@ -10,10 +10,10 @@ const Header = () => {
     // console.log("Token from header file:", token);
 
     return (
-        <header className='sticky z-20 top-0 w-full px-6 bg-white'>
+        <header className='sticky z-20 top-0 w-full pl-2 px-3 md:pl-5 md:px-8 bg-white'>
             <div className='flex justify-between items-center'>
                 <Link href={"/"}>
-                <Image src={logo} className='object-cover' alt='CV Analyzer' width={80} height={80} />
+                    <Image src={logo} className='object-cover' alt='CV Analyzer' width={80} height={80} />
                 </Link>
                 <div className='flex justify-center gap-4'>
                     {!token ?

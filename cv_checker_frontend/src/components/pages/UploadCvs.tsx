@@ -297,7 +297,7 @@ const UploadCvs = () => {
                 </div>
               )}
               {formState.response && (
-                <div className="text-center text-sm text-red-500">
+                <div className="text-center text-sm font-para text-red-500">
                   {formState.response}
                 </div>
               )}
@@ -309,9 +309,9 @@ const UploadCvs = () => {
 
   const renderNavigation = () => {
     if (formState.loading) return (
-      <div className='w-full flex flex-col justify-center items-center m-2'>
+      <div className='w-full flex flex-col justify-center items-center m-2 mb-6'>
         <Loader />
-        <p className='text-gray-500 font-para text-sm sm:text-lg text-center'>
+        <p className='text-gray-500 font-para text-sm sm:text-base text-center'>
           This may take a moment, but it’ll be faster than waiting for a human to handle it.
         </p>
       </div>

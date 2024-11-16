@@ -11,7 +11,7 @@ module.exports = {
   darkMode: "class",
   theme: {
     screens: {
-      'exsmall': '320px',
+      'exsmall': '340px',
       // => @media (min-width: 320px) { ... }
 
       'sm': '640px',
@@ -23,7 +23,7 @@ module.exports = {
       'lg': '1024px',
       // => @media (min-width: 1024px) { ... }
 
-      'xl': '1280px',
+      'xl': '1250px',
       // => @media (min-width: 1280px) { ... }
 
       '2xl': '1536px',
@@ -40,9 +40,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        link: ["Lato"],
-        heading: ["Alegreya"],
-        para: ["Merriweather"]
+        link: ["Lato", 'sans-serif'],
+        heading: ["Alegreya", 'sans-serif'],
+        para: ["Merriweather", 'sans-serif']
       },
       boxShadow: {
         input: `0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08)`,

@@ -9,7 +9,7 @@ const page = () => {
             <section className=''>
                 <Header />
             </section>
-            <section className='min-h-screen text-white font-sans p-8'>
+            <section className='min-h-screen text-white'>
                 <AllJobs />
             </section>
             <section className=''>
