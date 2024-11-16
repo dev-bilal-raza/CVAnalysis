@@ -95,6 +95,8 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
 
 
 def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
+    if user_data["status"] is not STATUS["SUCCESS"]:
+        return user_data
     jobs = session.exec(select(Job).where(Job.user_id == user_data["user_id"])).all()
     all_jobs = []
     for job in jobs:
@@ -107,7 +109,10 @@ def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], ses
                 "cv_count": cvs
             }
         )
-    return all_jobs
+    return {
+        "status": STATUS["SUCCESS"],
+        "jobs": all_jobs
+    }
 
 def get_all_applicants(user_id: str, session: DB_SESSION):
     jobs = session.exec(select(Job).where(Job.user_id == user_id)).all()

@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel
 from sqlmodel import Relationship, SQLModel, Field
-
+from datetime import datetime
 
 class JobBase(SQLModel):
     job_title: str
@@ -11,6 +11,7 @@ class JobBase(SQLModel):
 class Job(JobBase, table=True):
     job_id: int | None = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.user_id")
+    # created_at: datetime = datetime.now()
     cvs: List["Cv"] = Relationship(back_populates="job")
 
 

@@ -27,7 +27,7 @@ export function GridPattern() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-neutral-600 overflow-hidden">
+    <div className="fixed inset-0 z-0 w- h-full bg-gradient-to-r from-neutral-100 via-neutral-600 to-neutral-100 overflow-hidden">
       <div className="w-full h-full flex flex-wrap justify-start items-start gap-x-px gap-y-px">
         {Array.from({ length: dimensions.rows }).map((_, row) =>
           Array.from({ length: dimensions.columns }).map((_, col) => {
@@ -44,7 +44,7 @@ export function GridPattern() {
                   rounded-[2px]
                   ${index % 2 === 0
                     ? "bg-gray-50 dark:bg-neutral-950"
-                    : "bg-gray-50 dark:bg-neutral-950 shadow-[0px_0px_1px_3px_rgba(255,255,255,1)_inset] dark:shadow-[0px_0px_1px_3px_rgba(0,0,0,1)_inset]"
+                    : "bg-gray-50 dark:bg-neutral-950 shadow-[0px_0px_1px_3px_rgba(255,255,255,1)_inset] "
                   }
                 `}
               />
