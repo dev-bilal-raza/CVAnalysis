@@ -9,6 +9,7 @@ from pypdf import PdfReader
 from cv_checker_backend.common import STATUS
 import re
 
+
 async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_description: str = Form(...), cvs: List[UploadFile] = File(...), user: dict = Depends(get_user_from_session)):
     if user["status"] is not STATUS["SUCCESS"]:
         return user
@@ -28,7 +29,7 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
             "status": STATUS["ERROR"],
             "message": "Job already exists with this title."
         }
-        
+
     for cv in cvs:
         try:
             reader = PdfReader(cv.file)
@@ -46,7 +47,7 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
     response: dict[str, Any] = analyze_cv_by_openai(
         job_title, job_description, cvs_text)
     print("Result: ", response)
-    
+
     if response["status"] is not STATUS["SUCCESS"]:
         return response
     else:
@@ -63,13 +64,13 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
                         cv_features=cv_feature_table
                     )
                     cv_tables.append(cv_table)
-                if len(cv_tables) ==0:
+                if len(cv_tables) == 0:
                     return {
                         "status": STATUS["ERROR"],
                         "message": "No valid CVs found.",
                     }
                 job_table = Job(job_title=job_title,
-                                job_description=job_description, 
+                                job_description=job_description,
                                 cvs=cv_tables,
                                 user_id=user["user_id"]
                                 )
@@ -97,7 +98,8 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
 def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
     if user_data["status"] is not STATUS["SUCCESS"]:
         return user_data
-    jobs = session.exec(select(Job).where(Job.user_id == user_data["user_id"])).all()
+    jobs = session.exec(select(Job).where(
+        Job.user_id == user_data["user_id"])).all()
     all_jobs = []
     for job in jobs:
         cvs = len(job.cvs)
@@ -114,11 +116,12 @@ def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], ses
         "jobs": all_jobs
     }
 
+
 def get_all_applicants(user_id: str, session: DB_SESSION):
     jobs = session.exec(select(Job).where(Job.user_id == user_id)).all()
     all_applicants = []
     for job in jobs:
-        for cv in job.cvs:        
+        for cv in job.cvs:
             applicants = {
                 "cv_id": cv.cv_id,
                 "candidate_name": cv.candidate_name,
@@ -126,12 +129,12 @@ def get_all_applicants(user_id: str, session: DB_SESSION):
                 "candidate_email": cv.candidate_email,
                 "job_title": job.job_title,
                 "cv_features": cv.cv_features
-                } 
+            }
             all_applicants.append(applicants)
     return all_applicants
 
 
-def get_cvs_by_job_func(job_id: int, session: DB_SESSION):
+def get_cvs_by_job(job_id: int, session: DB_SESSION):
     job_data = session.get(Job, job_id)
     if not job_data:
         raise HTTPException(
@@ -187,13 +190,41 @@ def upload_new_cvs(session: DB_SESSION, job_id: int, cvs: List[UploadFile] = Fil
     return f"New Cvs has been uploaded successfully for {job_details.job_title} Job."
 
 
-def delete_job(job_id: int, session: DB_SESSION):
+def delete_job(job_id: int, user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
+    print("Job Id: ", job_id)
+    print("User Data: ", user_data)
+    if user_data["status"] is not STATUS["SUCCESS"]:
+        return user_data
     # Retrieve the job with the specified job_id
     job_table = session.get(Job, job_id)
     # If the job does not exist, raise a 404 exception
     if not job_table:
-        raise HTTPException(
-            status_code=404, detail=f"Job not found with this ID: {job_id}")
-    session.delete(job_table)
-    session.commit()
-    return f"Job description has been updated successfully for the job with ID: {job_id}."
+        return {
+            "status": STATUS["NOT_FOUND"],
+            "message": f"Job not found with this ID: {job_id}"
+        }
+    try:
+        # Delete all related Cv records
+        for cv in job_table.cvs:
+            # If cv_features also needs to be deleted
+            if cv.cv_features:
+                session.delete(cv.cv_features)
+            session.delete(cv)
+
+        # Delete the actual job record
+        session.delete(job_table)
+        session.commit()
+        # Get updated jobs list
+        data = get_all_jobs(user_data, session)
+        data.update({
+            "message": "Job has been successfully deleted."
+        })
+        return data
+
+    except Exception as e:
+        print(f"Error occured while deleting job: {str(e)}")
+        session.rollback()
+        return {
+            "status": STATUS["ERROR"],
+            "message": f"Something went wrong while deleting job. Please try again."
+        }
