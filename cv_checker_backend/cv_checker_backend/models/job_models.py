@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlmodel import Relationship, SQLModel, Field
 from datetime import datetime
 
+
 class JobBase(SQLModel):
     job_title: str
     job_description: str
@@ -12,7 +13,9 @@ class Job(JobBase, table=True):
     job_id: int | None = Field(primary_key=True)
     user_id: int = Field(foreign_key="user.user_id")
     # created_at: datetime = datetime.now()
-    cvs: List["Cv"] = Relationship(back_populates="job")
+    cvs: List["Cv"] = Relationship(back_populates="job", sa_relationship_kwargs={
+        "cascade": "all, delete-orphan"
+    })
 
 
 class Cv(SQLModel, table=True):
@@ -35,9 +38,10 @@ class CvFeatures(SQLModel, table=True):
     experience: str
     cv: Cv | None = Relationship(back_populates="cv_features")
 
+
 class Reviews(BaseModel):
     user_name: str
     field: str
     review: str
     rating: int
-    is_allowed: bool = Field(default=False) 
+    is_allowed: bool = Field(default=False)

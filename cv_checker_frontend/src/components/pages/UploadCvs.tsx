@@ -148,9 +148,11 @@ const UploadCvs = () => {
           toast.success(response.data.message,
             {
               style: {
-                border: '1px solid #039427',
+                border: '2px solid #DEF0E1',
                 padding: '16px',
                 color: 'black',
+                fontWeight: 'bold',
+                backgroundColor: '#F1F8F4'
               },
               iconTheme: {
                 primary: '#039427',
@@ -163,9 +165,11 @@ const UploadCvs = () => {
           toast.error(response?.data.message,
             {
               style: {
-                border: '1px solid #f71b31',
+                border: '2px solid #F3DDD7',
                 padding: '16px',
                 color: 'black',
+                fontWeight: 'bold',
+                backgroundColor: '#FBEFEB'
               },
               iconTheme: {
                 primary: '#f71b31',

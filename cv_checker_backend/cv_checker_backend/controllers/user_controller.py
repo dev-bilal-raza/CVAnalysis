@@ -6,6 +6,7 @@ from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuth # type: ignore
 from sqlmodel import select
 from cv_checker_backend.common import STATUS
+
 authSchema = OAuth2PasswordBearer(tokenUrl="/token")
 oauth = OAuth()
 
@@ -22,7 +23,7 @@ def create_user(user_data: dict, session: DB_SESSION):
             user_exist.avatar_url = user_data["avatar_url"]
             user_exist.token = user_data["token"]
             session.add(user_exist)
-        else:    
+        else:
             user = User(**user_data)
             session.merge(user)
         session.commit()
@@ -34,11 +35,12 @@ def create_user(user_data: dict, session: DB_SESSION):
 def get_user_from_session(request: Request, session: DB_SESSION):
     try:
         user_data = request.session.get("user")
+        print(user_data)
         if not user_data:
             return {"status": STATUS["NOT_AUTHORIZED"], "message": "You are not authorized user"}
         user_email = user_data.get("email") 
         user_in_db = session.exec(select(User).where(User.email == user_email)).one_or_none()
-        if not user_in_db:
+        if not (user_in_db and user_in_db.is_active):
             return {"status": STATUS["NOT_AUTHORIZED"], "message": "You are not authorized user"}
             
         return {"status": STATUS["SUCCESS"], **user_in_db.model_dump()}

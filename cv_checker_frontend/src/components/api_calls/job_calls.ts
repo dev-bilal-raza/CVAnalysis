@@ -32,3 +32,17 @@ export const get_job_details = async (job_id: number) => {
         return response
     }
 }
+
+export const delete_job = async (job_id: number) => {
+    const response = await axios.delete(`http://localhost:8000/api/v1/delete_job`,
+        {
+            withCredentials: true,
+            params: {job_id}
+        }
+    );
+    console.log("Response: ", response);
+    
+    if (response.status === 200) {
+        return response
+    }
+}
