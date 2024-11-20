@@ -1,6 +1,5 @@
 import React from 'react'
 import Image from 'next/image'
-import logo from "../../../public/logo.png"
 import Button from '../common/Button'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
@@ -13,7 +12,7 @@ const Header = () => {
         <header className='sticky z-20 top-0 w-full pl-2 px-3 md:pl-5 md:px-8 bg-white'>
             <div className='flex justify-between items-center'>
                 <Link href={"/"}>
-                    <Image src={logo} className='object-cover' alt='CV Analyzer' width={80} height={80} />
+                    <Image src={"/logo.png"} className='object-cover' alt='CV Analyzer' width={80} height={80} />
                 </Link>
                 <div className='flex justify-center gap-4'>
                     {!token ?

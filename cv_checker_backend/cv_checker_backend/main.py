@@ -4,6 +4,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from cv_checker_backend.settings import SECRET_KEY
 from cv_checker_backend.db.db_connector import create_db_and_tables
 from cv_checker_backend.routes import auth_routes, job_routes
+import uvicorn
+
 def lifespan(app: FastAPI):
     print("Create database....")
     create_db_and_tables()
@@ -52,3 +54,6 @@ app.include_router(router=job_routes.jobRoute)
 # @app.put("/api/v1/update_job_description")
 # def update_job_description(update_message: Annotated[str, Depends(update_description)]):
 #     return update_message
+
+def start():
+    uvicorn.run(app, host="0.0.0.0", port=8000)

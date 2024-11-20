@@ -3,7 +3,7 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <footer className='relative z-20 text-white p-6 bg-gradient-to-br from-black via-black to-[#2f0454]'>
+        <footer className='z-20 text-white p-6 bg-gradient-to-br from-black via-black to-[#2f0454]'>
             <div className='flex justify-center gap-2 items-center font-extralight font-sans text-small'>
                 <Link href={""}>Github</Link>
                 <Link href={""}>LinkedIn</Link>
