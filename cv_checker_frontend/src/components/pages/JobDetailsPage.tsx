@@ -6,7 +6,7 @@ const JobDetailsPage = ({job_id}: {job_id: number}) => {
     console.log("Job id: ", job_id);
     useEffect(() => {
 
-        const data = get_job_details(job_id)
+      const data = get_job_details(job_id)
 
     }, [])
   return (

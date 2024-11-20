@@ -1,4 +1,3 @@
-import BilalImage from "../../public/Bilal.jpg"
 export const reviews_data = [
     {
         id: 1,

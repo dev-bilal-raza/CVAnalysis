@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Marquee from "react-fast-marquee";
 import { reviews_data } from '@/data/reviews_data';
-import BIlalImage from "../../../public/Bilal.jpg"
 import Image from 'next/image';
 
 const ReviewsSection = () => {
@@ -40,8 +39,10 @@ const ReviewsSection = () => {
                             <div className="flex justify-center mb-6">
                                 <div className="w-24 h-24 rounded-full overflow-hidden">
                                     <Image
-                                        src={BIlalImage} 
+                                        src={"/Bilal.jpg"} 
                                         alt={review.name} 
+                                        width={100}
+                                        height={100}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>

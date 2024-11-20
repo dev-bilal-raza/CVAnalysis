@@ -5,11 +5,11 @@ import Footer from '@/components/layout/Footer'
 const page = () => {
 
     return (
-        <main>
+        <main className='relative'>
             <section className=''>
                 <Header />
             </section>
-            <section className='min-h-screen text-white'>
+            <section className='min-h-screen text-white relative'>
                 <AllJobs />
             </section>
             <section className=''>

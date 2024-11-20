@@ -18,11 +18,11 @@ const DeletePopup = ({ message, onDelete, isAllowed, setIsAllowed }: { message?:
     }
     return (
         isAllowed &&
-        <div className='absolute z-40 h-full right-0 left-0 backdrop-blur-3xl transition-all duration-1000 flex justify-center items-center'>
-            <div className='transition-all duration-1000 w-[80%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-[#FFFFFF] shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-md p-5 exsmall:p-7 sm:p-10'>
+        <div className={`${isAllowed? 'animate-fadeIn animate-slideInUp' : 'animate-slideOutDown'} absolute z-30 h-full right-0 left-0 backdrop-blur-3xl transition-all duration-1000 flex justify-center items-start`}>
+            <div className='transition-all duration-1000 w-[80%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-[#FFFFFF] shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-md p-5 exsmall:p-7 sm:p-10 mt-12'>
                 <div className='flex flex-col gap-4 items-center'>
                     <div className='bg-[#FFE4E6] rounded-full p-2'>
-                        <Image className='' src={"/alertIcon.png"} alt='Danger' width={25} height={19} />
+                        <Image className='' src={"/Icons/AlertIcon.png"} alt='Danger' width={25} height={19} />
                     </div>
                     <div className='flex flex-col gap-3 text-center'>
                         <h3 className='font-heading font-bold text-lg exsmall:text-xl md:text-3xl'>
