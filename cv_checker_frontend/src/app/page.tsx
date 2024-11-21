@@ -1,13 +1,12 @@
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
 import HomePage from "@/components/pages/Home"
+import MainContainer from "@/components/layout/MainContainer";
 
 export default function Home() {
   return (
-    <main>
-      <Header />
-      <HomePage />
-      <Footer />  
-    </main>
+    <MainContainer>
+      <div>
+        <HomePage />
+      </div>
+    </MainContainer>
   );
 }
