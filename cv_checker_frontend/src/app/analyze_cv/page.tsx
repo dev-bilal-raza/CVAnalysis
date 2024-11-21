@@ -1,8 +1,10 @@
 import React from 'react'
-
+import MainContainer from '@/components/layout/MainContainer'
 const page = () => {
   return (
-    <div>page</div>
+    <MainContainer>
+      <div>page</div>
+    </MainContainer>
   )
 }
 
