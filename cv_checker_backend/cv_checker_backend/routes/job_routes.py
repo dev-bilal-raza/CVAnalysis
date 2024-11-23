@@ -14,8 +14,8 @@ def getAllJobs(all_jobs: Annotated[dict, Depends(get_all_jobs)]):
     print(all_jobs)
     return all_jobs
 
-@jobRoute.get("/api/v1/get_job_details", response_model=dict[str, str | list])
-def getCVsByJob(job_details: Annotated[str, Depends(get_cvs_by_job)]):
+@jobRoute.get("/api/v1/get_job_details", response_model=dict)
+def getCVsByJob(job_details: Annotated[dict, Depends(get_cvs_by_job)]):
     if job_details:
         return job_details
 

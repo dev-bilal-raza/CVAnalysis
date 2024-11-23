@@ -46,5 +46,5 @@ def get_user_from_session(request: Request, session: DB_SESSION):
         return {"status": STATUS["SUCCESS"], **user_in_db.model_dump()}
     except Exception as e:
         print("ExceptionError: ", e)
-        return {"status": STATUS["INTERNAL_SERVER_ERROR"], "message": "Something went wrong."}        
+        return {"status": STATUS["INTERNAL_SERVER_ERROR"], "message": "Something went wrong. Please refresh the page and try again."}        
         

@@ -18,7 +18,7 @@ const DeletePopup = ({ message, onDelete, isAllowed, setIsAllowed }: { message?:
     }
     return (
         isAllowed &&
-        <div className={`${isAllowed? 'animate-fadeIn animate-slideInUp' : 'animate-slideOutDown'} absolute z-30 h-full right-0 left-0 backdrop-blur-3xl transition-all duration-1000 flex justify-center items-start`}>
+        <div className={`${isAllowed? 'animate-fadeIn animate-slideInUp' : 'animate-slideOutDown'} absolute z-10 h-full right-0 left-0 bg-white transition-all duration-1000 flex justify-center items-start`}>
             <div className='transition-all duration-1000 w-[80%] sm:w-[70%] md:w-[50%] lg:w-[40%] bg-[#FFFFFF] shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-md p-5 exsmall:p-7 sm:p-10 mt-12'>
                 <div className='flex flex-col gap-4 items-center'>
                     <div className='bg-[#FFE4E6] rounded-full p-2'>
