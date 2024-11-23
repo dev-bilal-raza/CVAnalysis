@@ -100,6 +100,11 @@ def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], ses
         return user_data
     jobs = session.exec(select(Job).where(
         Job.user_id == user_data["user_id"])).all()
+    if not jobs:
+        return {
+            "status": STATUS["NOT_FOUND"],
+            "message": "Could not find any jobs."
+        }
     all_jobs = []
     for job in jobs:
         cvs = len(job.cvs)
@@ -134,22 +139,37 @@ def get_all_applicants(user_id: str, session: DB_SESSION):
     return all_applicants
 
 
-def get_cvs_by_job(job_id: int, session: DB_SESSION):
-    job_data = session.get(Job, job_id)
-    if not job_data:
-        raise HTTPException(
-            status_code=404, detail=f"Job not found from this id: {job_id}")
-    job_details: dict[str, Any] = {
-        "job_title": job_data.job_title,
-        "cvs": []
-    }
-    for cv in job_data.cvs:
-        cv_details = {
-            **cv.model_dump(),
-            "features": cv.cv_features
+def get_cvs_by_job(user_data: Annotated[dict, Depends(get_user_from_session)], job_id: int, session: DB_SESSION):
+    try:    
+        if user_data["status"] is not STATUS["SUCCESS"]:
+            return user_data
+        job_data = session.get(Job, job_id)
+        if not job_data:
+            return {
+                "status": STATUS["NOT_FOUND"],
+                "message": "Could not find any job with this id."
+            }
+        job_details: dict[str, Any] = {
+            "job_title": job_data.job_title,
+            "cvs": []
         }
-        job_details["cvs"].append(cv_details)
-    return job_details
+        for cv in job_data.cvs:
+            cv_details = {
+                **cv.model_dump(),
+                "cv_features": cv.cv_features
+            }
+            job_details["cvs"].append(cv_details)
+        print("job details: ", job_details)
+        return {
+            "status": STATUS["SUCCESS"],
+            "job_details": job_details
+        }
+    except Exception as e:
+        print("Error while getting job details: ", e)
+        return {
+            "status": STATUS["ERROR"],
+            "message": "Something went wrong while getting job details. Please refresh the page and try again."
+        }
 
 
 def upload_new_cvs(session: DB_SESSION, job_id: int, cvs: List[UploadFile] = File(...)):

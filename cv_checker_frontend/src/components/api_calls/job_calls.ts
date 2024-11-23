@@ -19,29 +19,27 @@ export const add_job = async (job_details: FormData) => {
 }
 
 export const get_aLL_jobs = async () => {
-    const response = await axios.get('http://localhost:8000/api/v1/get_all_jobs', {withCredentials: true});
+    const response = await axios.get('http://localhost:8000/api/v1/get_all_jobs', { withCredentials: true });
     console.log("Response: ", response);
     return response
 }
 
 export const get_job_details = async (job_id: number) => {
-    const response = await axios.get(`http://localhost:8000/api/v1/get_job_details?job_id=${job_id}`, {withCredentials: true});
+    const response = await axios.get(`http://localhost:8000/api/v1/get_job_details?job_id=${job_id}`, { withCredentials: true });
     console.log("Response: ", response);
-    
-    if (response.status === 200) {
-        return response
-    }
+
+    return response
 }
 
 export const delete_job = async (job_id: number) => {
     const response = await axios.delete(`http://localhost:8000/api/v1/delete_job`,
         {
             withCredentials: true,
-            params: {job_id}
+            params: { job_id }
         }
     );
     console.log("Response: ", response);
-    
+
     if (response.status === 200) {
         return response
     }
