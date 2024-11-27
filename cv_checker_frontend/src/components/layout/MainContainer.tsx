@@ -5,7 +5,7 @@ import Footer from './Footer';
 const MainContainer = ({ children }: { children: React.ReactNode }) => {
     return (
         <main className=''>
-            <section className='sticky z-20 top-0 w-full'>
+            <section className='sticky z-30 top-0 w-full'>
                 <Header />
             </section>
             <section className='min-h-screen'>
