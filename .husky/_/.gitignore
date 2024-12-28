@@ -1,0 +1,3 @@
+# Ignore only unnecessary files
+*.log
+*.tmp

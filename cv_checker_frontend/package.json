@@ -6,7 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,css,json,md}\"",
+    "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,css,json,md}\"",
+    "husky-prepare": "cd .. && husky",
+    "pre-commit": "lint-staged",
+    "check-dependencies": "npm ls --depth=0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,css,json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.0.2",
@@ -30,9 +41,14 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
     "postcss": "^8",
+    "prettier": "^3.4.2",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
