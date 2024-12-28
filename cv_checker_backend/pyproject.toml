@@ -13,8 +13,8 @@ sqlmodel = "^0.0.21"
 openai = "^1.37.1"
 pypdf = "^4.3.1"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-psycopg = {extras = ["binary"], version = "^3.2.1"}
 itsdangerous = "^2.2.0"
+psycopg = "^3.2.3"
 
 [tool.poetry.scripts]
 dev = "cv_checker_backend.main:start"
