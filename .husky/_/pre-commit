@@ -2,7 +2,7 @@
 echo "Husky pre-commit has triggered"
 
 # Check for changes in specific file types in the frontend directory
-CHANGES=$(git diff --cached --name-only | grep '^doca_fe/.*\.\(js\|jsx\|ts\|tsx\|css\|json\|md\)$')
+CHANGES=$(git diff --cached --name-only | grep '^cv_checker_frontend/.*\.\(js\|jsx\|ts\|tsx\|css\|json\|md\)$')
 
 if [ -z "$CHANGES" ]; then
   echo "✅ No changes in the frontend directory. Skipping Prettier"
@@ -10,7 +10,7 @@ if [ -z "$CHANGES" ]; then
 fi
 
 # Navigate to the frontend directory
-cd doca_fe
+cd cv_checker_frontend || exit
 
 # Check for missing dependencies
 echo "🔍 Checking dependencies..."
