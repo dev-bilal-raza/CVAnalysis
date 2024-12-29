@@ -103,7 +103,7 @@ async def github_callback(request: Request, session: DB_SESSION):
             }
             # save user to your database            
             user_response = create_user(user_data, session)
-            print("Response while creating user in database: " + user_response)
+            print(f"Response while creating user in database: {user_response}")
 
             # Store user information in the session
             request.session["user"] = user_info
@@ -111,7 +111,9 @@ async def github_callback(request: Request, session: DB_SESSION):
         else:
             raise ValueError("No user info found in the response")
     except OAuthError as error:
+        print(f"OAuthError: {error}")
         raise HTTPException(status_code=400, detail=str(error))
     except Exception as e:
+        print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     

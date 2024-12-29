@@ -28,16 +28,21 @@ export const FormSvg = () => {
 }
 export const HeroBottomSvg = () => {
     return (
-        <svg id="visual" viewBox="0 0 900 50" preserveAspectRatio="none" width="100%">
-            <path
-                d="M0 42L30 39.2C60 36.3 120 30.7 180 30.7C240 30.7 300 36.3 360 39.3C420 42.3 480 42.7 540 41.2C600 39.7 660 36.3 720 32C780 27.7 840 22.3 870 19.7L900 17L900 0L870 0C840 0 780 0 720 0C660 0 600 0 540 0C480 0 420 0 360 0C300 0 240 0 180 0C120 0 60 0 30 0L0 0Z"
-                fill="#1E1B4B"
-                strokeLinecap="round"
-                strokeLinejoin="miter"
-                style={{ transition: "0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
-            />
-        </svg>
-    )
+      <svg
+        id="visual"
+        viewBox="0 0 900 50"
+        preserveAspectRatio="none"
+        width="100%"
+      >
+        <path
+          d="M0 42L30 39.2C60 36.3 120 30.7 180 30.7C240 30.7 300 36.3 360 39.3C420 42.3 480 42.7 540 41.2C600 39.7 660 36.3 720 32C780 27.7 840 22.3 870 19.7L900 17L900 0L870 0C840 0 780 0 720 0C660 0 600 0 540 0C480 0 420 0 360 0C300 0 240 0 180 0C120 0 60 0 30 0L0 0Z"
+          fill="#4F2790"
+          strokeLinecap="round"
+          strokeLinejoin="miter"
+          style={{ transition: '0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}
+        />
+      </svg>
+    );
 }
 
 export const NotFoundDataSvg = () => {

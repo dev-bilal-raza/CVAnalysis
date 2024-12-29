@@ -39,10 +39,10 @@ const DeletePopup = ({ message, onDelete, isAllowed, setIsAllowed }: { message?:
                             </div>
                             :
                             <div className='w-full flex flex-col gap-2 mt-3'>
-                                <Button is_delete={true} other_css='w-full' click_func={() => actionHandler()}>
+                                <Button is_delete={true} className='w-full' click_func={() => actionHandler()}>
                                     Delete
                                 </Button>
-                                <Button is_delete={false} other_css='w-full' click_func={() => setIsAllowed(false)}>
+                                <Button is_delete={false} className='w-full' click_func={() => setIsAllowed(false)}>
                                     Cancel
                                 </Button>
                             </div>

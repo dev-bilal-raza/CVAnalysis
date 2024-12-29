@@ -1,18 +1,28 @@
-import React from 'react'
+import React from 'react';
 
-const Button = ({ is_delete, children, click_func, other_css }: {
-    is_delete: boolean,
-    children: any,
-    click_func?: () => void,
-    other_css?: string
+const Button = ({
+  is_delete = false,
+  children,
+  status = 'primary',
+  click_func,
+  className,
+}: {
+  is_delete?: boolean;
+  children: React.ReactNode;
+  status?: 'primary' | 'secondary';
+  click_func?: () => void;
+  className?: string;
 }) => {
-    return (
-        <div className='border-b-2 hover:border-black duration-1000 border-transparent'>
-            <button className={`font-sans p-2 md:px-4 rounded-lg ${!is_delete ? "bg-black" : "bg-red-600"} text-white md:text-base text-sm  hover:text-black hover:bg-transparent duration-1000 ${other_css}`} onClick={click_func}>
-                {children}
-            </button>
-        </div>
-    )
-}
+  return (
+    <div className={``}>
+      <button
+        className={`font-sans p-2 md:px-4 rounded-md ${status === 'primary' ? (!is_delete ? 'bg-black' : 'bg-red-600') : !is_delete ? 'hover:bg-black' : 'hover:bg-red-600'} md:text-base text-sm ${status === 'primary' ? 'hover:text-black text-white' : 'hover:text-white text-black'} hover:bg-transparent duration-1000 border-2 rounded-lg ${status === 'primary' ? 'hover:border-black' : 'border-black hover:border-transparent'} duration-1000 border-transparent ${className}`}
+        onClick={click_func}
+      >
+        {children}
+      </button>
+    </div>
+  );
+};
 
-export default Button
+export default Button;
