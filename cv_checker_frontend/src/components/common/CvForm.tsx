@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 const CvForm = () => {
-    return (
-        <div>
-            {/* <form onSubmit={uploadJob} className='flex flex-col items-center gap-6 m-6 p-4 md:order-1 order-2'>
+  return (
+    <div>
+      {/* <form onSubmit={uploadJob} className='flex flex-col items-center gap-6 m-6 p-4 md:order-1 order-2'>
                 <p className='font-semibold text-lg text-red-500'>
                     {
                         message ? message : ""
@@ -44,9 +44,9 @@ const CvForm = () => {
                 <button className='bg-black hover:bg-black/75 text-white px-4 p-3 rounded-lg w-28' type='submit'>
                     Analyze
                 </button> */}
-            {/* </form> */}
-        </div>
-    )
-}
+      {/* </form> */}
+    </div>
+  );
+};
 
-export default CvForm
+export default CvForm;
