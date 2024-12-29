@@ -1,23 +1,27 @@
-"use client"
+'use client';
 import { useEffect, useState } from 'react';
 
 export function GridPattern() {
   const [dimensions, setDimensions] = useState({
     columns: 0,
-    rows: 0
+    rows: 0,
   });
 
   // Calculate grid dimensions based on viewport and cell size
   useEffect(() => {
     const calculateDimensions = () => {
-      const cellSize = window.innerWidth >= 1024 ? 48 : // lg
-                      window.innerWidth >= 768 ? 40 : // md
-                      window.innerWidth >= 640 ? 24 : // sm
-                      16; // default
-      
+      const cellSize =
+        window.innerWidth >= 1024
+          ? 48 // lg
+          : window.innerWidth >= 768
+            ? 40 // md
+            : window.innerWidth >= 640
+              ? 24 // sm
+              : 16; // default
+
       const columns = Math.ceil(window.innerWidth / cellSize);
       const rows = Math.ceil(window.innerHeight / cellSize);
-      
+
       setDimensions({ columns, rows });
     };
 
@@ -42,9 +46,10 @@ export function GridPattern() {
                   lg:h-12 lg:w-12 
                   flex-shrink-0 
                   rounded-[2px]
-                  ${index % 2 === 0
-                    ? "bg-gray-50 dark:bg-neutral-950"
-                    : "bg-gray-50 dark:bg-neutral-950 shadow-[0px_0px_1px_3px_rgba(255,255,255,1)_inset] "
+                  ${
+                    index % 2 === 0
+                      ? 'bg-gray-50 dark:bg-neutral-950'
+                      : 'bg-gray-50 dark:bg-neutral-950 shadow-[0px_0px_1px_3px_rgba(255,255,255,1)_inset] '
                   }
                 `}
               />

@@ -8,126 +8,135 @@
 
 /* width */
 ::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #888;
+  background: #888;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #1A1D3F;
-    border-radius: 5px;
+  background: #1a1d3f;
+  border-radius: 5px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #373c6e;
-    cursor: auto;
+  background: #373c6e;
+  cursor: auto;
 }
 
 .text-tooltip::after {
-    content: attr(aria-valuetext);
-    position: absolute;
-    background: #333;
-    color: #fff;
-    font-size: 14px;
-    padding: 5px 6px;
-    border-radius: 4px;
-    bottom: 100%;
-    left: 80%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 250ms ease-in-out, visibility 250ms ease-in-out;
-    z-index: 30;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-
+  content: attr(aria-valuetext);
+  position: absolute;
+  background: #333;
+  color: #fff;
+  font-size: 14px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  bottom: 100%;
+  left: 80%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 250ms ease-in-out,
+    visibility 250ms ease-in-out;
+  z-index: 30;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .text-tooltip:hover::after {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Media queries for responsive design */
 @media (max-width: 340px) {
-    .text-tooltip::after {
-        max-width: 200px;
-        left: 100%;
-        text-overflow: ellipsis;
-    }
+  .text-tooltip::after {
+    max-width: 200px;
+    left: 100%;
+    text-overflow: ellipsis;
+  }
 }
 
 @media (max-width: 640px) {
-    .text-tooltip::after {
-        font-size: 12px;
-        padding: 4px 5px;
-    }
+  .text-tooltip::after {
+    font-size: 12px;
+    padding: 4px 5px;
+  }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
-    .text-tooltip::after {
-        font-size: 13px;
-        padding: 5px 6px;
-    }
+  .text-tooltip::after {
+    font-size: 13px;
+    padding: 5px 6px;
+  }
 }
 
 @media (min-width: 1025px) {
-    .text-tooltip::after {
-        font-size: 14px;
-        padding: 6px 8px;
-    }
+  .text-tooltip::after {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes slideInUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideOutDown {
-    from {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateY(100%);
-        opacity: 0;
-    }
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
 .animate-fadeOut {
-    animation: fadeOut 0.3s ease-out forwards;
+  animation: fadeOut 0.3s ease-out forwards;
 }
 
 .animate-slideInUp {
-    animation: slideInUp 0.3s ease-out forwards;
+  animation: slideInUp 0.3s ease-out forwards;
 }
 
 .animate-slideOutDown {
-    animation: slideOutDown 0.3s ease-out forwards;
+  animation: slideOutDown 0.3s ease-out forwards;
 }

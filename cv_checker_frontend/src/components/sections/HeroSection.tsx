@@ -22,12 +22,10 @@ const HeroSection = () => {
             ensuring you find the perfect match faster and more efficiently.
             Save time, reduce bias, and hire the best talent with ease.
           </p>
-          <div className='flex gap-5'>
+          <div className="flex gap-5">
             {(token && (
               <Link href={'/upload_cvs'}>
-                <Button className="!px-6">
-                  Analyze
-                </Button>
+                <Button className="!px-6">Analyze</Button>
               </Link>
             )) || (
               <Link href={'/register'}>
