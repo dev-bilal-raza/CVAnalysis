@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface InputType {
+interface InputType extends React.InputHTMLAttributes<HTMLInputElement> {
   labelText: string;
   extraLabel?: string;
   otherClasses?: string;
@@ -16,6 +16,7 @@ const Input = ({
   setInput,
   input_value,
   is_required,
+  ...otherProps
 }: InputType) => {
   return (
     <div className="relative h-10 w-full">
@@ -25,6 +26,7 @@ const Input = ({
         value={input_value}
         onChange={(e) => setInput(e.target.value)}
         required={is_required ? is_required : false}
+        {...otherProps}
       />
       <label className="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate peer-placeholder-shown:text-text-purple-700 leading-tight peer-focus:leading-tight transition-all -top-1.5 peer-placeholder-shown:text-sm text-[11px] peer-focus:text-[11px] before:content[' '] before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all after:content[' '] after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-placeholder-shown:leading-[3.75] text-gray-400 peer-focus:text-purple-700 before:border-blue-gray-200 peer-focus:before:!border-purple-700 after:border-gray-200 peer-focus:after:!border-purple-700">
         {labelText} <span className="exsmall:inline hidden">{extraLabel}</span>
