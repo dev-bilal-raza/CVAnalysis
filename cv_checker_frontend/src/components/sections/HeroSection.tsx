@@ -10,7 +10,7 @@ const HeroSection = () => {
 
   return (
     <Container>
-      <div className="flex gap-4 items-center justify-between lg:flex-row flex-col rounded-lg mt-6 py-7 mb-8">
+      <div className="flex gap-4 items-center justify-between lg:flex-row flex-col rounded-lg py-7 mb-14">
         <div className="lg:w-[650px] xl:w-[650px] py-7 flex flex-col gap-6 justify-center lg:items-start items-center">
           <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-bold lg:text-left text-center">
             CV Analysis for Smarter Hiring
@@ -29,10 +29,10 @@ const HeroSection = () => {
               </Link>
             )) || (
               <Link href={'/register'}>
-                <Button is_delete={false}>SignIn</Button>
+                <Button is_delete={false}>Get Started</Button>
               </Link>
             )}
-            <Link href={'/upload_cvs'}>
+            <Link href={'http://medium.com/@develperbilalraza'}>
               <Button status="secondary" className="!px-6">
                 Blogs
               </Button>

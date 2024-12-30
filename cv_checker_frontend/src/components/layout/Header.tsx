@@ -29,9 +29,15 @@ const Header = () => {
               >
                 Home
               </Link>
-              <Button is_delete={false}>
-                <Link href={'/register'}>SignIn</Link>
-              </Button>
+              <Link href={'/register'}>
+                <Image
+                  className="bg-white object-cover cursor-pointer hover:translate-y-[-3px] transition-transform duration-300"
+                  src={'/Icons/LoginIcon.png'}
+                  alt="Get Started"
+                  width={32}
+                  height={32}
+                />
+              </Link>
             </ul>
           ) : (
             <ul className="flex justify-center items-center gap-6 font-medium text-lg font-sans">

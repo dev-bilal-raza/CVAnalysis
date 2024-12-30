@@ -1,28 +1,42 @@
 import React from 'react';
 
-const Button = ({
-  is_delete = false,
-  children,
-  status = 'primary',
-  click_func,
-  className,
-}: {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   is_delete?: boolean;
   children: React.ReactNode;
   status?: 'primary' | 'secondary';
   click_func?: () => void;
   className?: string;
-}) => {
-  return (
-    <div className={``}>
-      <button
-        className={`font-sans p-2 md:px-4 rounded-md ${status === 'primary' ? (!is_delete ? 'bg-black' : 'bg-red-600') : !is_delete ? 'hover:bg-black' : 'hover:bg-red-600'} md:text-base text-sm ${status === 'primary' ? 'hover:text-black text-white' : 'hover:text-white text-black'} hover:bg-transparent duration-1000 border-2 rounded-lg ${status === 'primary' ? 'hover:border-black' : 'border-black hover:border-transparent'} duration-1000 border-transparent ${className}`}
-        onClick={click_func}
-      >
-        {children}
-      </button>
-    </div>
-  );
-};
+}
+
+const Button: React.FC<ButtonProps> = React.memo(
+  ({
+    is_delete = false,
+    children,
+    status = 'primary',
+    click_func,
+    className,
+    ...otherProps
+  }) => {
+    const buttonClass = `font-sans p-2 md:px-4 rounded-md ${status === 'primary' ? (!is_delete ? 'bg-black' : 'bg-red-600') : !is_delete ? 'hover:bg-black' : 'hover:bg-red-600'} md:text-base text-sm ${status === 'primary' ? 'hover:text-black text-white hover:bg-transparent' : 'hover:text-white text-black'} duration-1000 border-2 border-black rounded-lg duration-1000 ${className}`;
+
+    return (
+      <div>
+        <button
+          className={buttonClass}
+          onClick={click_func}
+          aria-label={
+            status === 'primary' ? 'Primary Button' : 'Secondary Button'
+          }
+          role="button"
+          {...otherProps}
+        >
+          {children}
+        </button>
+      </div>
+    );
+  }
+);
+
+Button.displayName = 'Button';
 
 export default Button;
