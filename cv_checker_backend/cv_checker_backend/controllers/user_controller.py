@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException
-from cv_checker_backend.models.user_model import User
+from cv_checker_backend.models.user_model import User, UserInUpdate
 from cv_checker_backend.db.db_connector import DB_SESSION
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Request, HTTPException
@@ -31,6 +31,51 @@ def create_user(user_data: dict, session: DB_SESSION):
     except Exception as e:
         print("ExceptionError: ", e)
         return {"status": STATUS["INTERNAL_SERVER_ERROR"], "message": "Something went wrong."}        
+
+def get_user_by_id(user_id: int, session: DB_SESSION):
+    try:
+        user = session.get(User, user_id)
+        if not user:
+            return {
+                "status": STATUS["NOT_FOUND"],
+                "message": f"User could not found from id: {user_id}"
+            }
+        return {
+            "status": STATUS["SUCCESS"],
+            "user": user
+        }
+    except Exception as e:
+        print(f"Error occured while getting user from id, {e}")
+        return {
+            "status": STATUS["INTERNAL_SERVER_ERROR"],
+            "message": "Something went wrong while retrieving user data. Please refresh the page and try again."
+        }
+
+def get_user_by_email(email: str, session: DB_SESSION):
+    try:
+        user = session.exec(select(User).where(User.email == email)).one_or_none()
+        if not user:
+            return {
+                "status": STATUS["NOT_FOUND"],
+                "message": f"User could not found from email: {email}"
+            }
+        return {
+            "status": STATUS["SUCCESS"],
+            "user": user
+        }
+    except Exception as e:
+        print(f"Error occured while getting user from email, {e}")
+        return {
+            "status": STATUS["INTERNAL_SERVER_ERROR"],
+            "message": "Something went wrong while retrieving user data. Please refresh the page and try again."
+        }
+
+def update_user(user_details: UserInUpdate, session: DB_SESSION):
+    try:
+        ...
+    except Exception as e:
+        print(f"Error while updating user, {e}")
+    
 
 def get_user_from_session(request: Request, session: DB_SESSION):
     try:

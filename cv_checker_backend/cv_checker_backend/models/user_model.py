@@ -8,3 +8,7 @@ class User(SQLModel, table=True):
     avatar_url: str
     is_active: bool = False
     token: str
+
+class UserInUpdate(SQLModel):
+    user_name: Optional[str]
+    avatar_url: Optional[str]
