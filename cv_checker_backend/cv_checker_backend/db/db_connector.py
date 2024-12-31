@@ -1,6 +1,6 @@
 from cv_checker_backend.core.settings import DATABASE_URL
 from sqlmodel import create_engine, SQLModel, Session
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from typing import Annotated
 
 # create a connection to the database
