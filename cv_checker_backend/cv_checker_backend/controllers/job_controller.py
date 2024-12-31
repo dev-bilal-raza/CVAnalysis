@@ -6,7 +6,7 @@ from fastapi import Depends, UploadFile, File, HTTPException, Form
 from cv_checker_backend.db.db_connector import DB_SESSION
 from cv_checker_backend.controllers.openai_controller import analyze_cv_by_openai
 from pypdf import PdfReader
-from cv_checker_backend.common import STATUS
+from cv_checker_backend.core.common import STATUS
 import re
 
 

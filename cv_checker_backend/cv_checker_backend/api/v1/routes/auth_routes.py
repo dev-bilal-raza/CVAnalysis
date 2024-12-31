@@ -5,7 +5,7 @@ import httpx
 
 from cv_checker_backend.controllers.user_controller import create_user
 from cv_checker_backend.db.db_connector import DB_SESSION
-from cv_checker_backend.settings import BACKEND_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+from cv_checker_backend.core.settings import BACKEND_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 
 authRoute = APIRouter()
 
@@ -35,34 +35,49 @@ oauth.register(
 async def google_login(request: Request):
     redirect_uri = f"{BACKEND_URL}/api/v1/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
+from fastapi import Response
 
 @authRoute.get("/api/v1/auth/google/callback")
-async def google_callback(request: Request, session: DB_SESSION):
+async def google_callback(request: Request, session: DB_SESSION, response: Response):
     try:
         # Obtain the token response
         token = await oauth.google.authorize_access_token(request)
         print("Token response:", token)
     except OAuthError as error:
-        return HTTPException(status_code=400, detail=str(error))
+        # Handle the case where the user cancels or denies access
+        error_detail = "You canceled the authentication process. Please try again." if str(error).startswith("access_denied") else "Something went wrong during the authentication process. Please try again."
+        print("OAuthError:", error_detail)
+        
+        # Redirect the user to a friendly error page or login page
+        return RedirectResponse(url=f"{FRONTEND_URL}/register?error={error_detail}")
     
     # Extract the ID token from the token response
     user = token.get("userinfo")
     
-    # Debugging: Print user details
     if user:
         user_data = {
-        "user_name": user["name"],
-        "email": user["email"],
-        "avatar_url": user["picture"],
-        "token": token["id_token"],
-        "is_active": True
+            "user_name": user["name"],
+            "email": user["email"],
+            "avatar_url": user["picture"],
+            "token": token["id_token"],
+            "is_active": True
         }
         print("User details:", user_data)
         response = create_user(user_data, session)
-        # print("Response while creating user in database: " + response)
-        request.session["user"] = dict(user)
-
-    return RedirectResponse(url=FRONTEND_URL)
+        
+        # Set the ID token in a secure cookie
+        response = RedirectResponse(url=FRONTEND_URL)
+        response.set_cookie(
+            key="token",
+            value=token["id_token"],
+            httponly=True,  # Prevent JavaScript access
+            secure=True,    # Use Secure cookies (HTTPS only)
+            samesite="Lax"  # Restrict cookie to same-site requests
+        )
+        return response
+    
+    # Handle the case where user details are missing
+    raise HTTPException(status_code=400, detail="Failed to fetch user details")
 
 
 @authRoute.get("/api/v1/auth/github/login")

@@ -1,41 +1,47 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware 
-from cv_checker_backend.settings import SECRET_KEY
-from cv_checker_backend.db.db_connector import create_db_and_tables
-from cv_checker_backend.routes import auth_routes, job_routes
-import uvicorn
+from cv_checker_backend.api.v1.api import api_v1_router
+from cv_checker_backend.db.db_connector import connect_to_db
+from cv_checker_backend.core.settings import SECRET_KEY, ALLOWED_HOSTS
 
 def lifespan(app: FastAPI):
-    print("Create database....")
-    create_db_and_tables()
+    print("Connecting from database....")
+    connect_to_db()
     yield
 
+# App Metadata
+APP_VERSION = "1.0.0"
 
 # Initialize FastAPI app with configuration
 app = FastAPI(
-    title="Firebase Auth API",
-    description="An API for Firebase Google Authentication using FastAPI",
+    title="CV Analysis API",
+    description="A comprehensive API for analyzing and managing CVs, including user authentication, user management, and job management functionalities.",
+    version=APP_VERSION,
     lifespan=lifespan,
-    version="1.0.0",
-    openapi_url="/api/v1/openapi.json",
-    docs_url="/api/v1/docs",
-    redoc_url="/api/v1/redoc",
     openapi_tags=[
         {
-            "name": "auth",
-            "description": "Operations related to authentication"
+            "name": "Authentication",
+            "description": "Operations related to user authentication"
+        },
+        {
+            "name": "User Management",
+            "description": "Operations related to user management"
+        },
+        {
+            "name": "Job Management",
+            "description": "Operations related to job management"
         }
     ]
 )
 
-origins = ["https://cv-analyzer-oa7fkrczha-uc.a.run.app",
-           "http://localhost:3000"]
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["*"]
 
-# Uncomment it, if you want to use the default middleware for requesting
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_HOSTS,
     allow_credentials=True,
     allow_headers=["*"],
     allow_methods=["*"]
@@ -46,14 +52,7 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 async def home():
     return {"message": "Welcome to the CV Checker Project"}
 
-
-app.include_router(router=auth_routes.authRoute)
-app.include_router(router=job_routes.jobRoute)
-
-
-# @app.put("/api/v1/update_job_description")
-# def update_job_description(update_message: Annotated[str, Depends(update_description)]):
-#     return update_message
+app.include_router(api_v1_router)
 
 def start():
     uvicorn.run("cv_checker_backend.main:app", host="0.0.0.0", port=8000, reload=True)

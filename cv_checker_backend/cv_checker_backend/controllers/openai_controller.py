@@ -1,6 +1,6 @@
 import json
 from typing import Any, List, Optional
-from cv_checker_backend.common import STATUS
+from cv_checker_backend.core.common import STATUS
 from cv_checker_backend.config.openai_config import client
 
 
