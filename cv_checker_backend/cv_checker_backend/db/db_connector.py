@@ -27,4 +27,11 @@ DB_SESSION = Annotated[Session, Depends(get_session)]
 
 # create a function to connect to the database
 def connect_to_db() -> None:
-    SQLModel.metadata.create_all(engine)
+    try:
+        SQLModel.metadata.create_all(engine)
+    except Exception as e:
+        print(f"Failed to initialize database: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Database initialization failed"
+        )
