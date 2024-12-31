@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuth # type: ignore
 from sqlmodel import select
-from cv_checker_backend.common import STATUS
+from cv_checker_backend.core.common import STATUS
 
 authSchema = OAuth2PasswordBearer(tokenUrl="/token")
 oauth = OAuth()
