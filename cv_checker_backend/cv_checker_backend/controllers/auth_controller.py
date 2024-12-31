@@ -25,10 +25,12 @@ async def connect_with_google(request: Request, session: DB_SESSION):
     user = token.get("userinfo")
     
     if user:
+        if not user.get("email") or not user.get("name"):
+            raise HTTPException(status_code=400, detail="Invalid user data from OAuth provider")
         user_data = {
-            "user_name": user["name"],
-            "email": user["email"],
-            "avatar_url": user["picture"],
+            "user_name": user["name"].strip(),
+            "email": user["email"].lower().strip(),
+            "avatar_url": user.get("picture", ""),
             "token": token["id_token"],
             "is_active": True
         }
