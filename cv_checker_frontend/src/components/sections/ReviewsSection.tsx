@@ -1,8 +1,8 @@
 'use client';
+import Image from 'next/image';
 import React, { useState } from 'react';
 import Marquee from 'react-fast-marquee';
 import { reviews_data } from '@/data/reviews_data';
-import Image from 'next/image';
 
 const ReviewsSection = () => {
   const [hovered, setHovered] = useState<number | null>(null);

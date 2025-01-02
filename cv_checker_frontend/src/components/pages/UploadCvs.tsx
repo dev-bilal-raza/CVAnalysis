@@ -1,15 +1,12 @@
 'use client';
-import React, { FormEvent, useState } from 'react';
 import Input from '../common/Input';
-import Button from '../common/Button';
-import { add_job } from '../api_calls/job_calls';
-import { handleUploadFiles } from '@/utils/file_handler';
-import { FormSvg } from '../common/Svgs';
-import { useRouter } from 'next/navigation';
-import Loader from '../layout/loader/Loader';
-import { GridPattern } from '../ui/GridPattern';
 import { toast } from 'react-hot-toast';
 import { STATUS } from '@/common/constants';
+import { useRouter } from 'next/navigation';
+import Loader from '../layout/loader/Loader';
+import { add_job } from '../api_calls/job_calls';
+import React, { FormEvent, useState } from 'react';
+import { handleUploadFiles } from '@/utils/file_handler';
 
 const Stepper = ({
   step,

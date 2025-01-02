@@ -1,11 +1,10 @@
-from fastapi import Depends, HTTPException
-from cv_checker_backend.models.user_model import User, UserInUpdate
-from cv_checker_backend.db.db_connector import DB_SESSION
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import Request, HTTPException
-from authlib.integrations.starlette_client import OAuth # type: ignore
 from sqlmodel import select
+from fastapi import Request
+from fastapi.security import OAuth2PasswordBearer
 from cv_checker_backend.core.common import STATUS
+from authlib.integrations.starlette_client import OAuth # type: ignore
+from cv_checker_backend.db.db_connector import DB_SESSION
+from cv_checker_backend.models.user_model import User, UserInUpdate
 
 authSchema = OAuth2PasswordBearer(tokenUrl="/token")
 oauth = OAuth()

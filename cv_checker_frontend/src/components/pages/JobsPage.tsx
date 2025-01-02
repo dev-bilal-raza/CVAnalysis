@@ -1,20 +1,20 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Button from '../common/Button';
-import Loader from '../layout/loader/Loader';
-import { get_aLL_jobs, delete_job } from '../api_calls/job_calls';
-import { STATUS } from '@/common/constants';
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Container from '../layout/Container';
-import DeletePopup from '@/models/alert_popup';
-import DataNotFound from '../layout/DataNotFound';
+import toast from 'react-hot-toast';
+import Button from '../common/Button';
 import { IJob } from '@/types/job.types';
+import Container from '../layout/Container';
+import { useRouter } from 'next/navigation';
+import { STATUS } from '@/common/constants';
+import Loader from '../layout/loader/Loader';
 import { getJobById } from '@/utils/methods';
+import DeletePopup from '@/models/alert_popup';
 import { normalizeText } from '@/utils/helper';
 import ShowDataPopup from '@/models/data_popup';
+import DataNotFound from '../layout/DataNotFound';
+import React, { useEffect, useState } from 'react';
 import { IPopUpdata } from '@/types/PopUpData.types';
+import { get_aLL_jobs, delete_job } from '../api_calls/job_calls';
 
 const AllJobs = () => {
   const [loading, setLoading] = useState(true);

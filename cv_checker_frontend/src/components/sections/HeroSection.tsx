@@ -1,8 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import Button from '../common/Button';
 import { cookies } from 'next/headers';
-import Link from 'next/link';
 import Container from '../layout/Container';
 
 const HeroSection = () => {
