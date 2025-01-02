@@ -1,9 +1,9 @@
 import React from 'react';
-import { HeroSvg, HeroBottomSvg } from '../common/Svgs';
 import { MdCompare } from 'react-icons/md';
-import { SiWeightsandbiases } from 'react-icons/si';
 import { IoTimer } from 'react-icons/io5';
 import Container from '../layout/Container';
+import { HeroSvg, HeroBottomSvg } from '../common/Svgs';
+import { SiWeightsandbiases } from 'react-icons/si';
 
 const WhySection = () => {
   return (
