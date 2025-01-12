@@ -1,11 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import Button from '../common/Button';
-import Link from 'next/link';
-import { cookies } from 'next/headers';
+import { getToken } from '@/utils/helper';
 
 const Header = () => {
-  const token = cookies().get('session');
+  const token = getToken();
   // console.log("Token from header file:", token);
 
   return (
