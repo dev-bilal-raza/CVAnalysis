@@ -14,7 +14,7 @@ import ShowDataPopup from '@/models/data_popup';
 import DataNotFound from '../layout/DataNotFound';
 import React, { useEffect, useState } from 'react';
 import { IPopUpdata } from '@/types/PopUpData.types';
-import { get_aLL_jobs, delete_job } from '@/apis/job.api';
+import { getALLJobs, deleteJob } from '@/apis/job.api';
 
 const AllJobs = () => {
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ const AllJobs = () => {
   useEffect(() => {
     // Fetch jobs data from the FastAPI backend
     const fetch_jobs = async () => {
-      const response = await get_aLL_jobs();
+      const response = await getALLJobs();
       console.log('Jobs: ', response);
 
       if (response?.data.status === STATUS.SUCCESS) {
@@ -70,7 +70,7 @@ const AllJobs = () => {
       return;
     }
     try {
-      const response = await delete_job(JobToDelete);
+      const response = await deleteJob(JobToDelete);
       console.log('Response: ', response);
       if (response?.data.status === STATUS.SUCCESS) {
         setJobs(response?.data.jobs);
