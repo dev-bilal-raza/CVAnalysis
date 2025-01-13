@@ -14,7 +14,7 @@ import ShowDataPopup from '@/models/data_popup';
 import DataNotFound from '../layout/DataNotFound';
 import React, { useEffect, useState } from 'react';
 import { IPopUpdata } from '@/types/PopUpData.types';
-import { get_aLL_jobs, delete_job } from '../api_calls/job_calls';
+import { get_aLL_jobs, delete_job } from '@/apis/job.api';
 
 const AllJobs = () => {
   const [loading, setLoading] = useState(true);

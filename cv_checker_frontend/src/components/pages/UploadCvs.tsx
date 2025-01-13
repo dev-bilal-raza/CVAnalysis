@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { STATUS } from '@/common/constants';
 import { useRouter } from 'next/navigation';
 import Loader from '../layout/loader/Loader';
-import { add_job } from '../api_calls/job_calls';
+import { add_job } from '@/apis/job.api';
 import React, { FormEvent, useState } from 'react';
 import { handleUploadFiles } from '@/utils/file_handler';
 

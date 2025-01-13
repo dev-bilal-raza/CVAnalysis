@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { get_job_details } from '../api_calls/job_calls';
+import { get_job_details } from '@/apis/job.api';
 import { IJobDetails } from '@/types/job.types';
 import { STATUS } from '@/common/constants';
 import Container from '../layout/Container';
