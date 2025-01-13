@@ -1,13 +1,13 @@
-from typing import Annotated, Any, List
-from sqlmodel import select, func
-from cv_checker_backend.controllers.user_controller import get_user_from_session
-from cv_checker_backend.models.job_models import Job, Cv, CvFeatures
-from fastapi import Depends, UploadFile, File, HTTPException, Form
-from cv_checker_backend.db.db_connector import DB_SESSION
-from cv_checker_backend.controllers.openai_controller import analyze_cv_by_openai
-from pypdf import PdfReader
-from cv_checker_backend.core.common import STATUS
 import re
+from pypdf import PdfReader
+from sqlmodel import select, func
+from typing import Annotated, Any, List
+from fastapi import Depends, UploadFile, File, HTTPException, Form
+from cv_checker_backend.core.common import STATUS
+from cv_checker_backend.db.db_connector import DB_SESSION
+from cv_checker_backend.models.job_models import Job, Cv, CvFeatures
+from cv_checker_backend.controllers.user_controller import get_user_from_session
+from cv_checker_backend.controllers.openai_controller import analyze_cv_by_openai
 
 
 async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_description: str = Form(...), cvs: List[UploadFile] = File(...), user: dict = Depends(get_user_from_session)):

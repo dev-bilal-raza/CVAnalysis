@@ -1,5 +1,5 @@
 import httpx
-from fastapi import HTTPException, Request
+from fastapi import Request
 from fastapi.responses import RedirectResponse
 from cv_checker_backend.config.oauth_config import oauth
 from cv_checker_backend.core.settings import FRONTEND_URL
@@ -26,12 +26,11 @@ async def connect_with_google(request: Request, session: DB_SESSION):
     
     if user:
         if not user.get("email") or not user.get("name"):
-            raise HTTPException(status_code=400, detail="Invalid user data from OAuth provider")
+            return RedirectResponse(url=f"{FRONTEND_URL}/register?error=Details could not find from your google account.")
         user_data = {
             "user_name": user["name"].strip(),
             "email": user["email"].lower().strip(),
             "avatar_url": user.get("picture", ""),
-            "token": token["id_token"],
             "is_active": True
         }
         print("User details:", user_data)
@@ -39,11 +38,13 @@ async def connect_with_google(request: Request, session: DB_SESSION):
         
         # Set the ID token in a secure cookie
         response = RedirectResponse(url=FRONTEND_URL)
-        set_token_in_cookie(response, token["id_token"])
+        response = set_token_in_cookie(response, user_data)
+        if not isinstance(response,  RedirectResponse):
+            return RedirectResponse(url=f"{FRONTEND_URL}/register?error={response["message"]}")
         return response
     
     # Handle the case where user details are missing
-    raise HTTPException(status_code=400, detail="Failed to fetch user details")
+    return RedirectResponse(url=f"{FRONTEND_URL}/register?error=Details could not find from your google account.")
 
 
 async def connect_with_github(request: Request, session: DB_SESSION):
@@ -85,15 +86,16 @@ async def connect_with_github(request: Request, session: DB_SESSION):
             set_token_in_cookie(response, token["access_token"])
             return response
         else:
-            raise ValueError("No user info found in the response")
+            return RedirectResponse(url=f"{FRONTEND_URL}/register?error=Details could not find from your Github account.")
     
     except OAuthError as error:
         print(f"OAuthError: {error}")
-        raise HTTPException(status_code=400, detail=str(error))
+        error_detail  = ""
+        return RedirectResponse(url=f"{FRONTEND_URL}/register?error={error_detail}")
     
     except Exception as e:
         print(f"Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return RedirectResponse(url=f"{FRONTEND_URL}/register?error=An error occurred during the authentication process. Please refresh and try again.")
 
 
 def signup():

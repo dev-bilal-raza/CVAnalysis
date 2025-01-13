@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { get_job_details } from '../api_calls/job_calls';
+import { getJobDetails } from '@/apis/job.api';
 import { IJobDetails } from '@/types/job.types';
 import { STATUS } from '@/common/constants';
 import Container from '../layout/Container';
@@ -18,7 +18,7 @@ const JobDetailsPage = ({ job_id }: { job_id: number }) => {
   useEffect(() => {
     const fetch_job_details = async () => {
       setLoading(true);
-      const response = await get_job_details(job_id);
+      const response = await getJobDetails(job_id);
       console.log('Jobs: ', response);
 
       if (response?.data.status === STATUS.SUCCESS) {

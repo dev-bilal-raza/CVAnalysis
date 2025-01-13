@@ -1,13 +1,9 @@
 from sqlmodel import select
 from fastapi import Request
-from fastapi.security import OAuth2PasswordBearer
 from cv_checker_backend.core.common import STATUS
-from authlib.integrations.starlette_client import OAuth # type: ignore
 from cv_checker_backend.db.db_connector import DB_SESSION
 from cv_checker_backend.models.user_model import User, UserInUpdate
 
-authSchema = OAuth2PasswordBearer(tokenUrl="/token")
-oauth = OAuth()
 
 def create_user(user_data: dict, session: DB_SESSION):
     try:  
@@ -66,7 +62,7 @@ def get_user_by_email(email: str, session: DB_SESSION):
         print(f"Error occured while getting user from email, {e}")
         return {
             "status": STATUS["INTERNAL_SERVER_ERROR"],
-            "message": "Something went wrong while retrieving user data. Please refresh the page and try again."
+            "message": "Something went wrong while retrieving user data from email. Please refresh the page and try again."
         }
 
 def update_user(user_details: UserInUpdate, session: DB_SESSION):

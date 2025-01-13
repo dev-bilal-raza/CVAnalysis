@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { STATUS } from '@/common/constants';
 import { useRouter } from 'next/navigation';
 import Loader from '../layout/loader/Loader';
-import { add_job } from '../api_calls/job_calls';
+import { addJob } from '@/apis/job.api';
 import React, { FormEvent, useState } from 'react';
 import { handleUploadFiles } from '@/utils/file_handler';
 
@@ -161,7 +161,7 @@ const UploadCvs = () => {
       formData.append('job_description', formState.jobDescription);
 
       try {
-        const response = await add_job(formData);
+        const response = await addJob(formData);
         console.log('Response: ', response);
         if (response?.data.status === STATUS.SUCCESS) {
           setFormState((prev) => ({ ...prev, loading: false }));

@@ -1,4 +1,4 @@
-import { FaqType } from '@/types/faqs.module';
+import { FaqType } from '@/types/faqs.types';
 
 export let faqs: FaqType[] = [
   {
