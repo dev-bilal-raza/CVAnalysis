@@ -39,7 +39,7 @@ def decode_token(token: str):
     """
     try:
         # Decode the token to retrieve the payload data
-        decoded_data = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        decoded_data = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM, options={"verify_exp": True})
         return {
             "status": STATUS["SUCCESS"],
             "data": decoded_data
