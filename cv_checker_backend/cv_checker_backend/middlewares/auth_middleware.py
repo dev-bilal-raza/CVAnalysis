@@ -14,19 +14,22 @@ def authenticate_user(request: Request, token: Annotated[str, Depends(oauth_sche
         print(f"Token: {token}")
         if not len(token) > 0:
             print("token not found")
-            raise HTTPException(status_code=401, detail="You are not authorized user. Please login to continue.")
+            request.state.user = None
+            # raise HTTPException(status_code=401, detail="You are not authorized user. Please login to continue.")
             # return {
             #     "status": STATUS["NOT_AUTHORIZED"],
             #     "message": "You are not authorized user. Please login to continue."
             # }
         response = validate_user(token, session)
         if response["status"] is not STATUS["SUCCESS"]:
-            raise HTTPException(status_code=401, detail="Access denied. Please login to continue.")
+            request.state.user = None
+            # raise HTTPException(status_code=401, detail="Access denied. Please login to continue.")
             # return response
         request.state.user = response["user"]
     except Exception as e:
         print("Error while authenticating user from token: ", e)
-        raise HTTPException(status_code=401, detail="Access denied. Please login to continue.")
+        request.state.user = None
+        # raise HTTPException(status_code=401, detail="Access denied. Please login to continue.")
         # return {
         #     "status": STATUS["NOT_AUTHORIZED"],
         #     "message": "Access denied. Please login to continue."

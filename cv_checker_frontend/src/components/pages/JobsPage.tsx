@@ -15,53 +15,90 @@ import DataNotFound from '../layout/DataNotFound';
 import React, { useEffect, useState } from 'react';
 import { IPopUpdata } from '@/types/PopUpData.types';
 import { getALLJobs, deleteJob } from '@/apis/job.api';
+import { getToken, removeToken } from '@/services/cookie.service';
 
 const AllJobs = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [IsDeleteAllowed, setIsDeleteAllowed] = useState(false);
   const [dataToShow, setDataToShow] = useState<IPopUpdata>();
   const [JobToDelete, setJobToDelete] = useState<number | null>();
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [filterJobs, setFilterJobs] = useState<IJob[]>([]);
   const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
 
   // router to redirect user to the specified location
   const router = useRouter();
 
   // useeffrect to fetch jobs on first time
   useEffect(() => {
+    let token: null | string = null;
+    const tokenHandler = async () => {
+      token = await getToken();
+      if (hasCheckedToken) return; // Prevent duplicate checks
+      setHasCheckedToken(true); // Mark as checked
+      if (!token) {
+        toast.error(
+          'You are not nuthorized to access this page. Please login to continue',
+          {
+            style: {
+              border: '2px solid #F3DDD7',
+              padding: '16px',
+              color: 'black',
+              fontWeight: 'bold',
+              backgroundColor: '#FBEFEB',
+            },
+            iconTheme: {
+              primary: '#f71b31',
+              secondary: '#FFFAEE',
+            },
+          }
+        );
+        setTimeout(() => {
+          router.push('/register');
+        }, 2000);
+      }
+    };
     // Fetch jobs data from the FastAPI backend
     const fetch_jobs = async () => {
+      setLoading(true);
       const response = await getALLJobs();
       console.log('Jobs: ', response);
 
-      if (response?.data.status === STATUS.SUCCESS) {
-        setJobs(response.data.jobs);
-        setFilterJobs(response.data.jobs);
+      if (response?.status === STATUS.SUCCESS) {
+        setJobs(response.jobs);
+        setFilterJobs(response.jobs);
         setLoading(false);
       } else {
-        setErrMsg(response?.data.message);
+        setErrMsg(response?.message);
         setLoading(false);
-        toast.error(response?.data.message, {
+        toast.error(response?.message, {
           style: {
-            border: '1px solid #f71b31',
+            border: '2px solid #F3DDD7',
             padding: '16px',
             color: 'black',
+            fontWeight: 'bold',
+            backgroundColor: '#FBEFEB',
           },
           iconTheme: {
             primary: '#f71b31',
             secondary: '#FFFAEE',
           },
         });
-        if (response?.data.status === STATUS.NOT_AUTHORIZED) {
+        if (response?.status === STATUS.NOT_AUTHORIZED) {
+          await removeToken();
           setTimeout(() => {
             router.push('/register');
           }, 4000);
         }
       }
     };
-
-    fetch_jobs();
+    tokenHandler().then(() => {
+      console.log('Check Token: ', hasCheckedToken);
+      if (token) {
+        fetch_jobs();
+      }
+    });
   }, []);
 
   const jobDeleteHandler = async () => {

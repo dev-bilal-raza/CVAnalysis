@@ -32,7 +32,7 @@ const makeRequest = async (
       }
     }
     if (authRequired) {
-      const token = getToken();
+      const token = await getToken();
       console.log('token', token);
       headers['Authorization'] = `Bearer ${token}`;
     }

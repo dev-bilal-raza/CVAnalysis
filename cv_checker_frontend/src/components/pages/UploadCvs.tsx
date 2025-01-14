@@ -5,8 +5,9 @@ import { STATUS } from '@/common/constants';
 import { useRouter } from 'next/navigation';
 import Loader from '../layout/loader/Loader';
 import { addJob } from '@/apis/job.api';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useState, useEffect } from 'react';
 import { handleUploadFiles } from '@/utils/file_handler';
+import { getToken } from '@/services/cookie.service';
 
 const Stepper = ({
   step,
@@ -92,9 +93,35 @@ const UploadCvs = () => {
     response: '',
     loading: false,
   });
-
   const router = useRouter();
 
+  useEffect(() => {
+    const tokenHandler = async () => {
+      const token = await getToken();
+      if (!token) {
+        toast.error(
+          'You are not nuthorized to access this page. Please login to continue',
+          {
+            style: {
+              border: '2px solid #F3DDD7',
+              padding: '16px',
+              color: 'black',
+              fontWeight: 'bold',
+              backgroundColor: '#FBEFEB',
+            },
+            iconTheme: {
+              primary: '#f71b31',
+              secondary: '#FFFAEE',
+            },
+          }
+        );
+        setTimeout(() => {
+          router.push('/register');
+        }, 2000);
+      }
+    };
+    tokenHandler();
+  }, []);
   // Function to count non-whitespace characters
   const countNonWhitespace = (str: string): number => {
     return str.replace(/\s/g, '').length;
