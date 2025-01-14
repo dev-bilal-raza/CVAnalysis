@@ -1,18 +1,22 @@
 import re
 from pypdf import PdfReader
+from typing import Any, List
 from sqlmodel import select, func
-from typing import Annotated, Any, List
-from fastapi import Depends, UploadFile, File, HTTPException, Form
 from cv_checker_backend.core.common import STATUS
 from cv_checker_backend.db.db_connector import DB_SESSION
+from fastapi import UploadFile, File, HTTPException, Form, Request
 from cv_checker_backend.models.job_models import Job, Cv, CvFeatures
-from cv_checker_backend.controllers.user_controller import get_user_from_session
 from cv_checker_backend.controllers.openai_controller import analyze_cv_by_openai
+from cv_checker_backend.models.user_model import User
 
 
-async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_description: str = Form(...), cvs: List[UploadFile] = File(...), user: dict = Depends(get_user_from_session)):
-    if user["status"] is not STATUS["SUCCESS"]:
-        return user
+async def upload_job(request: Request, session: DB_SESSION, job_title: str = Form(None), job_description: str = Form(...), cvs: List[UploadFile] = File(...)):
+    user = request.state.user
+    if not user:
+        return {
+            "status": STATUS["NOT_AUTHORIZED"],
+            "message": "You are not authorized user. Please login to continue."
+        }
     cv_tables: List[Cv] = []
     cvs_text = []
     print(job_title)
@@ -95,31 +99,43 @@ async def upload_job(session: DB_SESSION, job_title: str = Form(None), job_descr
             }
 
 
-def get_all_jobs(user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
-    if user_data["status"] is not STATUS["SUCCESS"]:
-        return user_data
-    jobs = session.exec(select(Job).where(
-        Job.user_id == user_data["user_id"])).all()
-    if not jobs:
-        return {
-            "status": STATUS["NOT_FOUND"],
-            "message": "Could not find any jobs."
-        }
-    all_jobs = []
-    for job in jobs:
-        cvs = len(job.cvs)
-        all_jobs.append(
-            {
-                "job_id": job.job_id,
-                "job_title": job.job_title,
-                "job_description": job.job_description,
-                "cv_count": cvs
+def get_all_jobs(request: Request, session: DB_SESSION):
+    try:
+        user: User = request.state.user
+        if not user:
+            return {
+                "status": STATUS["NOT_AUTHORIZED"],
+                "message": "You are not authorized user. Please login to continue."
             }
-        )
-    return {
-        "status": STATUS["SUCCESS"],
-        "jobs": all_jobs
-    }
+        print(f"User in Job: {user}")
+        jobs = session.exec(select(Job).where(
+            Job.user_id == user.user_id)).all()
+        if not jobs:
+            return {
+                "status": STATUS["NOT_FOUND"],
+                "message": "Could not find any jobs."
+            }
+        all_jobs = []
+        for job in jobs:
+            cvs = len(job.cvs)
+            all_jobs.append(
+                {
+                    "job_id": job.job_id,
+                    "job_title": job.job_title,
+                    "job_description": job.job_description,
+                    "cv_count": cvs
+                }
+            )
+        return {
+            "status": STATUS["SUCCESS"],
+            "jobs": all_jobs
+        }
+    except Exception as e:
+        print("Error while getting all jobs: ", e)
+        return {
+            "status": STATUS["INTERNAL_SERVER_ERROR"],
+            "message": "Something went wrong while fetching jobs. Please refresh the page and try again."
+        }
 
 
 def get_all_applicants(user_id: str, session: DB_SESSION):
@@ -139,10 +155,14 @@ def get_all_applicants(user_id: str, session: DB_SESSION):
     return all_applicants
 
 
-def get_cvs_by_job(user_data: Annotated[dict, Depends(get_user_from_session)], job_id: int, session: DB_SESSION):
-    try:    
-        if user_data["status"] is not STATUS["SUCCESS"]:
-            return user_data
+def get_cvs_by_job(request: Request, job_id: int, session: DB_SESSION):
+    try:
+        user: User = request.state.user
+        if not user:
+            return {
+                "status": STATUS["NOT_AUTHORIZED"],
+                "message": "You are not authorized user. Please login to continue."
+            }
         job_data = session.get(Job, job_id)
         if not job_data:
             return {
@@ -210,20 +230,23 @@ def upload_new_cvs(session: DB_SESSION, job_id: int, cvs: List[UploadFile] = Fil
     return f"New Cvs has been uploaded successfully for {job_details.job_title} Job."
 
 
-def delete_job(job_id: int, user_data: Annotated[dict, Depends(get_user_from_session)], session: DB_SESSION):
-    print("Job Id: ", job_id)
-    print("User Data: ", user_data)
-    if user_data["status"] is not STATUS["SUCCESS"]:
-        return user_data
-    # Retrieve the job with the specified job_id
-    job_table = session.get(Job, job_id)
-    # If the job does not exist, raise a 404 exception
-    if not job_table:
-        return {
-            "status": STATUS["NOT_FOUND"],
-            "message": f"Job not found with this ID: {job_id}"
-        }
+def delete_job(job_id: int, request: Request, session: DB_SESSION):
     try:
+        print("Job Id: ", job_id)
+        user = request.state.user
+        if not user:
+            return {
+                "status": STATUS["NOT_AUTHORIZED"],
+                "message": "You are not authorized user. Please login to continue."
+            }
+        # Retrieve the job with the specified job_id
+        job_table = session.get(Job, job_id)
+        # If the job does not exist, raise a 404 exception
+        if not job_table:
+            return {
+                "status": STATUS["NOT_FOUND"],
+                "message": f"Job not found with this ID: {job_id}"
+            }
         # Delete all related Cv records
         for cv in job_table.cvs:
             # If cv_features also needs to be deleted
@@ -235,7 +258,7 @@ def delete_job(job_id: int, user_data: Annotated[dict, Depends(get_user_from_ses
         session.delete(job_table)
         session.commit()
         # Get updated jobs list
-        data = get_all_jobs(user_data, session)
+        data = get_all_jobs(request, session)
         data.update({
             "message": "Job has been successfully deleted."
         })

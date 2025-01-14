@@ -1,8 +1,11 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
+from cv_checker_backend.middlewares.auth_middleware import authenticate_user
 from cv_checker_backend.controllers.job_controller import get_all_jobs, upload_job, upload_new_cvs, get_cvs_by_job, delete_job
 
 jobRoute = APIRouter()
+
+jobRoute.dependencies = [Depends(authenticate_user)]
 
 @jobRoute.post("/add_job")
 def addJob(message: Annotated[str, Depends(upload_job)]):
