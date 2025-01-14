@@ -38,7 +38,7 @@ async def connect_with_google(request: Request, session: DB_SESSION):
         
         # Set the ID token in a secure cookie
         response = RedirectResponse(url=FRONTEND_URL)
-        response = set_token_in_cookie(response, user_data)
+        response = await set_token_in_cookie(response, user_data)
         if not isinstance(response,  RedirectResponse):
             return RedirectResponse(url=f"{FRONTEND_URL}/register?error={response["message"]}")
         return response
@@ -74,7 +74,6 @@ async def connect_with_github(request: Request, session: DB_SESSION):
                 "user_name": user_info.get("login"),
                 "avatar_url": user_info.get("avatar_url"),
                 "email": user_info.get("email") , # Include email now
-                "token": token["access_token"],
                 "is_active": True
             }
             # save user to your database            
@@ -83,7 +82,9 @@ async def connect_with_github(request: Request, session: DB_SESSION):
 
             # Store user information in the session
             response = RedirectResponse(url=FRONTEND_URL)  # Redirect to frontend
-            set_token_in_cookie(response, token["access_token"])
+            response = await set_token_in_cookie(response, user_data)
+            if not isinstance(response,  RedirectResponse):
+                return RedirectResponse(url=f"{FRONTEND_URL}/register?error={response["message"]}")
             return response
         else:
             return RedirectResponse(url=f"{FRONTEND_URL}/register?error=Details could not find from your Github account.")

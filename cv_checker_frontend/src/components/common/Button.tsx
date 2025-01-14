@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = React.memo(
     className,
     ...otherProps
   }) => {
-    const buttonClass = `font-sans p-2 md:px-4 rounded-md ${status === 'primary' ? (!is_delete ? 'bg-black' : 'bg-red-600') : !is_delete ? 'hover:bg-black' : 'hover:bg-red-600'} md:text-base text-sm ${status === 'primary' ? 'hover:text-black text-white hover:bg-transparent' : 'hover:text-white text-black'} duration-1000 border-2 border-black rounded-lg duration-1000 ${className}`;
+    const buttonClass = `font-sans p-2 md:px-4 rounded-md ${status === 'primary' ? (!is_delete ? 'bg-black' : 'bg-red-600') : !is_delete ? 'hover:bg-black' : 'hover:bg-red-600'} md:text-base text-sm ${status === 'primary' ? 'hover:text-black text-white hover:bg-transparent' : 'hover:text-white text-black'} duration-1000 border-2 ${!is_delete ? 'border-black' : 'border-red-600 hover:border-black'} rounded-lg duration-1000 ${className}`;
 
     return (
       <div>

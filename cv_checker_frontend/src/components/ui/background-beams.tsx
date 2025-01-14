@@ -96,9 +96,9 @@ export const BackgroundBeamsWithCollision = ({
         className
       )}
     >
-      {beams.map((beam) => (
+      {beams.map((beam, i) => (
         <CollisionMechanism
-          key={beam.initialX + 'beam-idx'}
+          key={beam.initialX + 'beam-idx' + i}
           beamOptions={beam}
           containerRef={containerRef}
           parentRef={parentRef}

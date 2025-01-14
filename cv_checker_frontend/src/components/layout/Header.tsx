@@ -4,9 +4,9 @@ import Image from 'next/image';
 import Button from '../common/Button';
 import { getToken } from '@/services/cookie.service';
 
-const Header = () => {
-  const token = getToken();
-  // console.log("Token from header file:", token);
+const Header = async () => {
+  const token = await getToken();
+  console.log('Token from header file:', token);
 
   return (
     <header className="pl-2 px-3 md:pl-5 md:px-8 bg-white">

@@ -1,14 +1,19 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import {
   registerWithGoogle,
   registerWithGithub,
 } from '@/app/(auth)/auth_handler';
-
+import { getToken } from '@/services/cookie.service';
+import toast from 'react-hot-toast';
 export function SignIn() {
   type HandlerName = 'google' | 'github';
-
+  // const [errMsg, setErrMsg] = useState();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const errMsg = searchParams.get('error');
   const signInHandler = (handler_name: HandlerName) => {
     const handlers: { [key in HandlerName]: () => void } = {
       google: registerWithGoogle,
@@ -17,6 +22,29 @@ export function SignIn() {
 
     handlers[handler_name]();
   };
+  useEffect(() => {
+    const tokenHandler = async () => {
+      const token = await getToken();
+      console.log('Error hanlding: ');
+      if (token) {
+        toast.success('You are already logged in!', {
+          style: {
+            border: '2px solid #DEF0E1',
+            padding: '16px',
+            color: 'black',
+            fontWeight: 'bold',
+            backgroundColor: '#F1F8F4',
+          },
+          iconTheme: {
+            primary: '#039427',
+            secondary: '#FFFAEE',
+          },
+        });
+        router.push('/');
+      }
+    };
+    tokenHandler();
+  }, []);
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-black">
@@ -48,6 +76,7 @@ export function SignIn() {
           <BottomGradient />
         </button>
       </div>
+      {errMsg && <p className="text-red-500 mt-4">{errMsg}</p>}
       <div className="bg-gradient-to-r from-transparent via-neutral-700 to-transparent my-8 h-[1px] w-full" />
     </div>
   );
