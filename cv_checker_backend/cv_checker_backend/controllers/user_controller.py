@@ -1,3 +1,4 @@
+from fastapi import Request
 from sqlmodel import select
 from cv_checker_backend.core.common import STATUS
 from cv_checker_backend.db.db_connector import DB_SESSION
@@ -61,6 +62,25 @@ def get_user_by_email(email: str, session: DB_SESSION):
         return {
             "status": STATUS["INTERNAL_SERVER_ERROR"],
             "message": "Something went wrong while retrieving user data from email. Please refresh the page and try again."
+        }
+
+def get_user_details(request: Request):
+    try:    
+        user = request.state.user
+        if not user:
+            return {
+                "status": STATUS["NOT_AUTHORIZED"],
+                "message": "You are not authorized user. Please login to continue."
+            }
+        return {
+            "status": STATUS["SUCCESS"],
+            "user": user
+        }
+    except Exception as e:
+        print(f"Error while getting user details, {e}")
+        return {
+            "status": STATUS["INTERNAL_SERVER_ERROR"],
+            "message": "Something went wrong while retrieving user details. Please refresh the page and try again."
         }
 
 def update_user(user_details: UserInUpdate, session: DB_SESSION):

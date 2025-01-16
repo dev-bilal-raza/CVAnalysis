@@ -5,6 +5,7 @@ from cv_checker_backend.controllers.job_controller import get_all_jobs, upload_j
 
 jobRoute = APIRouter()
 
+# Adding dependency on authenticate_user middleware to authenticate user before accessing routes in jobRoute.
 jobRoute.dependencies = [Depends(authenticate_user)]
 
 @jobRoute.post("/add_job")
