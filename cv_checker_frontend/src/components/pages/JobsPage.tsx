@@ -61,18 +61,43 @@ const AllJobs = () => {
     };
     // Fetch jobs data from the FastAPI backend
     const fetch_jobs = async () => {
-      setLoading(true);
-      const response = await getALLJobs();
-      console.log('Jobs: ', response);
+      try {
+        setLoading(true);
+        const response = await getALLJobs();
+        console.log('Jobs: ', response);
 
-      if (response?.status === STATUS.SUCCESS) {
-        setJobs(response.jobs);
-        setFilterJobs(response.jobs);
+        if (response?.status === STATUS.SUCCESS) {
+          setJobs(response.jobs);
+          setFilterJobs(response.jobs);
+          setLoading(false);
+        } else {
+          setErrMsg(response?.message);
+          setLoading(false);
+          toast.error(response?.message, {
+            style: {
+              border: '2px solid #F3DDD7',
+              padding: '16px',
+              color: 'black',
+              fontWeight: 'bold',
+              backgroundColor: '#FBEFEB',
+            },
+            iconTheme: {
+              primary: '#f71b31',
+              secondary: '#FFFAEE',
+            },
+          });
+          if (response?.status === STATUS.NOT_AUTHORIZED) {
+            await removeToken();
+            setTimeout(() => {
+              router.push('/register');
+            }, 4000);
+          }
+        }
+      } catch (error) {
+        console.error('Error in fetching jobs: ', error);
         setLoading(false);
-      } else {
-        setErrMsg(response?.message);
-        setLoading(false);
-        toast.error(response?.message, {
+        setErrMsg('An error occurred while fetching jobs.');
+        toast.error('An error occurred while fetching jobs.', {
           style: {
             border: '2px solid #F3DDD7',
             padding: '16px',
@@ -85,14 +110,9 @@ const AllJobs = () => {
             secondary: '#FFFAEE',
           },
         });
-        if (response?.status === STATUS.NOT_AUTHORIZED) {
-          await removeToken();
-          setTimeout(() => {
-            router.push('/register');
-          }, 4000);
-        }
       }
     };
+
     tokenHandler().then(() => {
       console.log('Check Token: ', hasCheckedToken);
       if (token) {
