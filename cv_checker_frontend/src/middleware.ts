@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from './services/cookie.service';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken();
-  // Token validation check
-  if (!token) {
+  try {
+    const token = await getToken();
+    if (!token) {
+      const redirectUrl = new URL('/register', request.nextUrl);
+      return NextResponse.redirect(redirectUrl);
+    }
+  } catch (error) {
     const redirectUrl = new URL('/register', request.nextUrl);
     return NextResponse.redirect(redirectUrl);
   }
