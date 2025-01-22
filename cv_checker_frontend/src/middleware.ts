@@ -3,7 +3,7 @@ import { getToken } from './services/cookie.service';
 
 export async function middleware(request: NextRequest) {
   const token = await getToken();
-  console.log('No token found, redirecting to login', token);
+  // Token validation check
   if (!token) {
     const redirectUrl = new URL('/register', request.nextUrl);
     return NextResponse.redirect(redirectUrl);
