@@ -15,7 +15,7 @@ import DataNotFound from '../layout/DataNotFound';
 import React, { useEffect, useState } from 'react';
 import { IPopUpdata } from '@/types/PopUpData.types';
 import { getALLJobs, deleteJob } from '@/apis/job.api';
-import { getToken, removeToken } from '@/services/cookie.service';
+import { removeToken } from '@/services/cookie.service';
 
 const AllJobs = () => {
   const [loading, setLoading] = useState(false);
@@ -25,40 +25,12 @@ const AllJobs = () => {
   const [jobs, setJobs] = useState<IJob[]>([]);
   const [filterJobs, setFilterJobs] = useState<IJob[]>([]);
   const [errMsg, setErrMsg] = useState<string | null>(null);
-  const [hasCheckedToken, setHasCheckedToken] = useState(false);
 
   // router to redirect user to the specified location
   const router = useRouter();
 
   // useeffrect to fetch jobs on first time
   useEffect(() => {
-    let token: null | string = null;
-    const tokenHandler = async () => {
-      token = await getToken();
-      if (hasCheckedToken) return; // Prevent duplicate checks
-      setHasCheckedToken(true); // Mark as checked
-      if (!token) {
-        toast.error(
-          'You are not nuthorized to access this page. Please login to continue',
-          {
-            style: {
-              border: '2px solid #F3DDD7',
-              padding: '16px',
-              color: 'black',
-              fontWeight: 'bold',
-              backgroundColor: '#FBEFEB',
-            },
-            iconTheme: {
-              primary: '#f71b31',
-              secondary: '#FFFAEE',
-            },
-          }
-        );
-        setTimeout(() => {
-          router.push('/register');
-        }, 2000);
-      }
-    };
     // Fetch jobs data from the FastAPI backend
     const fetch_jobs = async () => {
       try {
@@ -112,13 +84,7 @@ const AllJobs = () => {
         });
       }
     };
-
-    tokenHandler().then(() => {
-      console.log('Check Token: ', hasCheckedToken);
-      if (token) {
-        fetch_jobs();
-      }
-    });
+    fetch_jobs();
   }, []);
 
   const jobDeleteHandler = async () => {
