@@ -8,7 +8,7 @@ userRoute = APIRouter()
 # Adding dependency on authenticate_user middleware to authenticate user before accessing routes in userRoute.
 userRoute.dependencies = [Depends(authenticate_user)]
 
-@userRoute.get("/get_user_getails")
+@userRoute.get("/get_user_details")
 def getUserDetails(user_details: Annotated[dict, Depends(get_user_details)]):
     return user_details
 
