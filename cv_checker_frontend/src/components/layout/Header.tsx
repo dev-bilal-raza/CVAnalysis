@@ -5,15 +5,16 @@ import Button from '../common/Button';
 import { STATUS } from '@/common/constants';
 import { getToken } from '@/services/cookie.service';
 import { getUserDetails } from '@/apis/user.api';
+import { ProfileIcon } from '../ui/ProfileIcon';
 
 const Header = async () => {
   const token = await getToken();
-  console.log('Token from header file:', token);
+  // console.log('Token from header file:', token);
   let userDetails;
   if (token) {
     try {
       userDetails = await getUserDetails();
-      console.log('User details:', userDetails);
+      // console.log('User details:', userDetails);
     } catch (error) {
       console.log('Error:', error);
       userDetails = null;
@@ -57,13 +58,17 @@ const Header = async () => {
                 <Button is_delete={false}>Upload CVs</Button>
               </Link>
               <div className="cursor-pointer">
-                <Image
+                <ProfileIcon
+                  src={userDetails?.user?.avatar_url}
+                  alt="User Profile"
+                />
+                {/* <Image
                   className="border-4 rounded-full transform transition-all duration-500 hover:border-opacity-70 hover:scale-110 hover:shadow-lg active:scale-95"
                   src={userDetails?.user?.avatar_url}
                   alt="User Profile"
                   width={55}
                   height={50}
-                />
+                /> */}
               </div>
             </ul>
           ) : (
@@ -77,7 +82,7 @@ const Header = async () => {
               <Link href={'/register'}>
                 <Image
                   className="bg-white object-cover cursor-pointer hover:translate-y-[-3px] transition-transform duration-300"
-                  src={'/Icons/LoginIcon.png'}
+                  src={'/Icons/AuthIcon.png'}
                   alt="Get Started"
                   width={32}
                   height={32}
